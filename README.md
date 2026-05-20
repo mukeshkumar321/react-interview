@@ -11,23 +11,6 @@ A complete and structured React learning + interview preparation repository desi
 This repository covers everything from React fundamentals to advanced architecture, performance optimization, machine coding, Next.js, TypeScript, and senior-level interview concepts.
 
 
-## 📌 Quick Navigation
-
-| Topic | Link |
-|------|------|
-| React Rendering & Internals | [Go to Topic](./1-react-rendering-and-internals.md) |
-| Hooks Deep Dive | [Go to Topic](./2-hooks-deep-dive.md) |
-| Performance Optimization | [Go to Topic](./3-performance-optimization.md) |
-| State Management | [Go to Topic](./4-state-management.md) |
-| Advanced Component Patterns | [Go to Topic](./5-advanced-component-patterns.md) |
-| React + TypeScript | [Go to Topic](./6-react-typescript.md) |
-| Async React & Data Fetching | [Go to Topic](./7-async-react-and-data-fetching.md) |
-| Next.js | [Go to Topic](./8-nextjs.md) |
-| Frontend Architecture | [Go to Topic](./9-frontend-architecture.md) |
-| Machine Coding | [Go to Topic](./10-machine-coding.md) |
-| Senior Interview Questions | [Go to Topic](./11-senior-interview-questions.md) |
-
-
 ## 📚 Repository Structure
 
 ### [1. React Rendering & Internals](./1-react-rendering-and-internals.md)
