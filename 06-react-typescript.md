@@ -1251,6 +1251,26 @@ Utility types reduce duplication significantly in enterprise applications.
 
 
 
+### satisfies Operator (TS 4.9+)
+
+Validates that a value matches a type without widening it.
+
+```tsx
+type Theme = { primary: string; secondary: string };
+
+const theme = {
+  primary: "blue",
+  secondary: "gray",
+  accent: "red"
+} satisfies Partial<Theme>;
+
+// theme.accent is still accessible (not widened to Theme)
+```
+
+Useful when you want type checking but need to keep the exact inferred type.
+
+
+
 ## 18. Discriminated Unions
 
 ### What Are They?

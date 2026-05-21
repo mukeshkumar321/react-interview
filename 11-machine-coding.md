@@ -1,5 +1,49 @@
 # Machine Coding
 
+## 📚 Topics Covered
+
+- [1. Introduction to React Machine Coding](#1-introduction-to-react-machine-coding)
+- [2. Machine Coding Interview Strategy](#2-machine-coding-interview-strategy)
+- [3. Requirement Analysis Techniques](#3-requirement-analysis-techniques)
+- [4. Component Breakdown Strategy](#4-component-breakdown-strategy)
+- [5. State Design for Machine Coding](#5-state-design-for-machine-coding)
+- [6. Folder Structure During Interviews](#6-folder-structure-during-interviews)
+- [7. Reusable Component Design](#7-reusable-component-design)
+- [8. Scalable State Management in Machine Coding](#8-scalable-state-management-in-machine-coding)
+- [9. API Integration Patterns](#9-api-integration-patterns)
+- [10. Loading and Error Handling](#10-loading-and-error-handling)
+- [11. Search Functionality Implementation](#11-search-functionality-implementation)
+- [12. Debounced Search Implementation](#12-debounced-search-implementation)
+- [13. Pagination Implementation](#13-pagination-implementation)
+- [14. Infinite Scroll Implementation](#14-infinite-scroll-implementation)
+- [15. Data Table Implementation](#15-data-table-implementation)
+- [16. Sorting and Filtering Systems](#16-sorting-and-filtering-systems)
+- [17. Modal System Implementation](#17-modal-system-implementation)
+- [18. Toast Notification System](#18-toast-notification-system)
+- [19. Accordion Component](#19-accordion-component)
+- [20. Tabs Component](#20-tabs-component)
+- [21. Dropdown Component](#21-dropdown-component)
+- [22. Multi-select Component](#22-multi-select-component)
+- [23. Autocomplete Component](#23-autocomplete-component)
+- [24. Theme Toggle System](#24-theme-toggle-system)
+- [25. Multi-step Form Implementation](#25-multi-step-form-implementation)
+- [26. Dynamic Form Builder](#26-dynamic-form-builder)
+- [27. File Upload System](#27-file-upload-system)
+- [28. Drag and Drop Implementation](#28-drag-and-drop-implementation)
+- [29. Kanban Board Implementation](#29-kanban-board-implementation)
+- [30. Chat UI Architecture](#30-chat-ui-architecture)
+- [31. Real-time UI Concepts](#31-real-time-ui-concepts)
+- [32. Optimistic UI Implementation](#32-optimistic-ui-implementation)
+- [33. Virtualized List Implementation](#33-virtualized-list-implementation)
+- [34. Performance Optimization in Machine Coding](#34-performance-optimization-in-machine-coding)
+- [35. Accessibility in Machine Coding](#35-accessibility-in-machine-coding)
+- [36. Error Boundary Usage](#36-error-boundary-usage)
+- [37. Clean Code Practices During Interviews](#37-clean-code-practices-during-interviews)
+- [38. Common Machine Coding Mistakes](#38-common-machine-coding-mistakes)
+- [39. Production-level Thinking in Interviews](#39-production-level-thinking-in-interviews)
+- [40. Senior-level Machine Coding Discussions](#40-senior-level-machine-coding-discussions)
+
+---
 
 
 ## 1. Introduction to React Machine Coding

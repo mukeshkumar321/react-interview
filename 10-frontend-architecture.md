@@ -1,5 +1,50 @@
 # Frontend Architecture
 
+## 📚 Topics Covered
+
+- [1. Introduction to Frontend Architecture](#1-introduction-to-frontend-architecture)
+- [2. Why Frontend Architecture Matters](#2-why-frontend-architecture-matters)
+- [3. Monolithic vs Modular Frontend Architecture](#3-monolithic-vs-modular-frontend-architecture)
+- [4. Scalable React Application Structure](#4-scalable-react-application-structure)
+- [5. Feature-based Folder Structure](#5-feature-based-folder-structure)
+- [6. Domain-driven Frontend Structure](#6-domain-driven-frontend-structure)
+- [7. Shared vs Feature-specific Modules](#7-shared-vs-feature-specific-modules)
+- [8. Component Layering Strategy](#8-component-layering-strategy)
+- [9. UI Layer vs Business Logic Layer](#9-ui-layer-vs-business-logic-layer)
+- [10. API Layer Architecture](#10-api-layer-architecture)
+- [11. Service Layer Patterns](#11-service-layer-patterns)
+- [12. State Layer Architecture](#12-state-layer-architecture)
+- [13. Global State Organization](#13-global-state-organization)
+- [14. State Colocation Strategy](#14-state-colocation-strategy)
+- [15. Design System Architecture](#15-design-system-architecture)
+- [16. Shared Component Library Architecture](#16-shared-component-library-architecture)
+- [17. Theme System Architecture](#17-theme-system-architecture)
+- [18. Authentication Architecture](#18-authentication-architecture)
+- [19. Authorization and Access Control](#19-authorization-and-access-control)
+- [20. Routing Architecture](#20-routing-architecture)
+- [21. Error Handling Architecture](#21-error-handling-architecture)
+- [22. Logging and Monitoring Strategy](#22-logging-and-monitoring-strategy)
+- [23. Environment Configuration Management](#23-environment-configuration-management)
+- [24. Feature Flag Architecture](#24-feature-flag-architecture)
+- [25. Frontend Security Fundamentals](#25-frontend-security-fundamentals)
+- [26. Performance-oriented Architecture](#26-performance-oriented-architecture)
+- [27. Code Splitting Architecture](#27-code-splitting-architecture)
+- [28. Micro Frontend Basics](#28-micro-frontend-basics)
+- [29. Monorepo Fundamentals](#29-monorepo-fundamentals)
+- [30. Dependency Management Strategy](#30-dependency-management-strategy)
+- [31. Scalable Form Architecture](#31-scalable-form-architecture)
+- [32. Scalable Data Fetching Architecture](#32-scalable-data-fetching-architecture)
+- [33. Offline-first Frontend Concepts](#33-offline-first-frontend-concepts)
+- [34. Testing Architecture](#34-testing-architecture)
+- [35. CI/CD Concepts for Frontend](#35-cicd-concepts-for-frontend)
+- [36. Production Build and Deployment Strategy](#36-production-build-and-deployment-strategy)
+- [37. Frontend Scalability Challenges](#37-frontend-scalability-challenges)
+- [38. Architecture Tradeoff Discussions](#38-architecture-tradeoff-discussions)
+- [39. Frontend Architecture Anti-patterns](#39-frontend-architecture-anti-patterns)
+- [40. Production-level Architecture Best Practices](#40-production-level-architecture-best-practices)
+- [41. Common Senior-level Interview Questions](#41-common-senior-level-interview-questions)
+
+---
 
 
 ## 1. Introduction to Frontend Architecture

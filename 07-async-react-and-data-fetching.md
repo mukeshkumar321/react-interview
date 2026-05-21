@@ -1,5 +1,45 @@
 # Async React & Data Fetching
 
+## 📚 Topics Covered
+
+- [1. Introduction to Async React](#1-introduction-to-async-react)
+- [2. Client-side vs Server-side Data Fetching](#2-client-side-vs-server-side-data-fetching)
+- [3. Data Fetching Lifecycle in React](#3-data-fetching-lifecycle-in-react)
+- [4. Fetch API in React](#4-fetch-api-in-react)
+- [5. Axios in React Applications](#5-axios-in-react-applications)
+- [6. Async State Handling](#6-async-state-handling)
+- [7. Loading, Error, and Empty States](#7-loading-error-and-empty-states)
+- [8. Data Fetching with useEffect](#8-data-fetching-with-useeffect)
+- [9. Async/Await Patterns in React](#9-asyncawait-patterns-in-react)
+- [10. AbortController and Request Cancellation](#10-abortcontroller-and-request-cancellation)
+- [11. Race Conditions in Data Fetching](#11-race-conditions-in-data-fetching)
+- [12. Preventing Stale Data Issues](#12-preventing-stale-data-issues)
+- [13. Parallel API Requests](#13-parallel-api-requests)
+- [14. Sequential API Requests](#14-sequential-api-requests)
+- [15. Request Deduplication](#15-request-deduplication)
+- [16. Polling and Real-time Fetching](#16-polling-and-real-time-fetching)
+- [17. Retry Mechanisms](#17-retry-mechanisms)
+- [18. Pagination Strategies](#18-pagination-strategies)
+- [19. Infinite Scroll Implementation](#19-infinite-scroll-implementation)
+- [20. Debounced Search Requests](#20-debounced-search-requests)
+- [21. Optimistic UI Updates](#21-optimistic-ui-updates)
+- [22. Caching Strategies](#22-caching-strategies)
+- [23. Cache Invalidation](#23-cache-invalidation)
+- [24. Prefetching Techniques](#24-prefetching-techniques)
+- [25. TanStack Query Deep Dive](#25-tanstack-query-deep-dive)
+- [26. Query Keys and Cache Management](#26-query-keys-and-cache-management)
+- [27. Mutations in TanStack Query](#27-mutations-in-tanstack-query)
+- [28. Suspense for Data Fetching](#28-suspense-for-data-fetching)
+- [29. Error Boundary Integration](#29-error-boundary-integration)
+- [30. Streaming Data Concepts](#30-streaming-data-concepts)
+- [31. API Layer Architecture](#31-api-layer-architecture)
+- [32. Secure API Communication](#32-secure-api-communication)
+- [33. Data Fetching Performance Optimization](#33-data-fetching-performance-optimization)
+- [34. Async React Anti-patterns](#34-async-react-anti-patterns)
+- [35. Production-level Data Fetching Best Practices](#35-production-level-data-fetching-best-practices)
+- [36. Common Senior-level Interview Questions](#36-common-senior-level-interview-questions)
+
+---
 
 
 ## 1. Introduction to Async React

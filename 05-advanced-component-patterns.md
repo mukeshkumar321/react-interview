@@ -1,5 +1,41 @@
 # Advanced Component Patterns
 
+## 📚 Topics Covered
+
+- [1. Introduction to Component Patterns](#1-introduction-to-component-patterns)
+- [2. Why Component Patterns Matter](#2-why-component-patterns-matter)
+- [3. Reusable Component Architecture](#3-reusable-component-architecture)
+- [4. Component API Design Principles](#4-component-api-design-principles)
+- [5. Smart vs Presentational Components](#5-smart-vs-presentational-components)
+- [6. Controlled Components Pattern](#6-controlled-components-pattern)
+- [7. Uncontrolled Components Pattern](#7-uncontrolled-components-pattern)
+- [8. Compound Components Pattern](#8-compound-components-pattern)
+- [9. Flexible Compound Components](#9-flexible-compound-components)
+- [10. Provider Pattern](#10-provider-pattern)
+- [11. Higher Order Components (HOC)](#11-higher-order-components-hoc)
+- [12. HOC Composition Patterns](#12-hoc-composition-patterns)
+- [13. Render Props Pattern](#13-render-props-pattern)
+- [14. Custom Hooks vs Render Props vs HOC](#14-custom-hooks-vs-render-props-vs-hoc)
+- [15. Headless Component Architecture](#15-headless-component-architecture)
+- [16. Slot-based Component APIs](#16-slot-based-component-apis)
+- [17. Polymorphic Components](#17-polymorphic-components)
+- [18. Forwarding Refs in Component Libraries](#18-forwarding-refs-in-component-libraries)
+- [19. Imperative APIs with Components](#19-imperative-apis-with-components)
+- [20. Controlled vs Uncontrolled API Tradeoffs](#20-controlled-vs-uncontrolled-api-tradeoffs)
+- [21. Building Reusable Form Components](#21-building-reusable-form-components)
+- [22. Building Scalable Modal Systems](#22-building-scalable-modal-systems)
+- [23. Shared Component Libraries](#23-shared-component-libraries)
+- [24. Design System Fundamentals](#24-design-system-fundamentals)
+- [25. Themeable Component Architecture](#25-themeable-component-architecture)
+- [26. Accessibility in Component Design](#26-accessibility-in-component-design)
+- [27. Component Composition Strategies](#27-component-composition-strategies)
+- [28. Component Scalability Challenges](#28-component-scalability-challenges)
+- [29. Avoiding Prop Explosion](#29-avoiding-prop-explosion)
+- [30. Component Pattern Anti-patterns](#30-component-pattern-anti-patterns)
+- [31. Production-level Component Best Practices](#31-production-level-component-best-practices)
+- [32. Common Senior-level Interview Questions](#32-common-senior-level-interview-questions)
+
+---
 
 
 ## 1. Introduction to Component Patterns
@@ -686,7 +722,7 @@ This is a very common senior interview question.
 ### Comparison
 
 | Pattern | Best For | Downsides |
-|---|---||
+|---|---|---|
 | HOC | Cross-cutting concerns | Wrapper nesting |
 | Render Props | Flexible rendering | Nested JSX |
 | Custom Hooks | Shared logic | Hooks-only usage |

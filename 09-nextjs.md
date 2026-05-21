@@ -1,5 +1,51 @@
 # Next.js
 
+## 📚 Topics Covered
+
+- [1. Introduction to Next.js](#1-introduction-to-nextjs)
+- [2. Why Next.js is Used in Modern React Applications](#2-why-nextjs-is-used-in-modern-react-applications)
+- [3. Next.js Architecture Overview](#3-nextjs-architecture-overview)
+- [4. App Router vs Pages Router](#4-app-router-vs-pages-router)
+- [5. File-based Routing System](#5-file-based-routing-system)
+- [6. Nested Routing](#6-nested-routing)
+- [7. Dynamic Routes](#7-dynamic-routes)
+- [8. Layouts in Next.js](#8-layouts-in-nextjs)
+- [9. Server Components in Next.js](#9-server-components-in-nextjs)
+- [10. Client Components in Next.js](#10-client-components-in-nextjs)
+- [11. Server vs Client Rendering](#11-server-vs-client-rendering)
+- [12. Rendering Strategies in Next.js](#12-rendering-strategies-in-nextjs)
+- [13. SSR (Server-side Rendering)](#13-ssr-server-side-rendering)
+- [14. SSG (Static Site Generation)](#14-ssg-static-site-generation)
+- [15. ISR (Incremental Static Regeneration)](#15-isr-incremental-static-regeneration)
+- [16. Streaming and Suspense in Next.js](#16-streaming-and-suspense-in-nextjs)
+- [17. Data Fetching in Server Components](#17-data-fetching-in-server-components)
+- [18. Data Fetching in Client Components](#18-data-fetching-in-client-components)
+- [19. Server Actions](#19-server-actions)
+- [20. Route Handlers](#20-route-handlers)
+- [21. Middleware in Next.js](#21-middleware-in-nextjs)
+- [22. Authentication Patterns](#22-authentication-patterns)
+- [23. Caching Mechanisms in Next.js](#23-caching-mechanisms-in-nextjs)
+- [24. Revalidation Strategies](#24-revalidation-strategies)
+- [25. Hydration in Next.js](#25-hydration-in-nextjs)
+- [26. Hydration Mismatch Problems](#26-hydration-mismatch-problems)
+- [27. SEO Optimization in Next.js](#27-seo-optimization-in-nextjs)
+- [28. Metadata API](#28-metadata-api)
+- [29. Image Optimization](#29-image-optimization)
+- [30. Font Optimization](#30-font-optimization)
+- [31. Script Optimization](#31-script-optimization)
+- [32. Code Splitting in Next.js](#32-code-splitting-in-nextjs)
+- [33. Environment Variables](#33-environment-variables)
+- [34. API Layer Architecture in Next.js](#34-api-layer-architecture-in-nextjs)
+- [35. Error Handling in Next.js](#35-error-handling-in-nextjs)
+- [36. Loading UI and Error UI](#36-loading-ui-and-error-ui)
+- [37. Deployment Strategies](#37-deployment-strategies)
+- [38. Edge Runtime Basics](#38-edge-runtime-basics)
+- [39. Performance Optimization in Next.js](#39-performance-optimization-in-nextjs)
+- [40. Common Next.js Production Issues](#40-common-nextjs-production-issues)
+- [41. Next.js Best Practices](#41-nextjs-best-practices)
+- [42. Common Senior-level Interview Questions](#42-common-senior-level-interview-questions)
+
+---
 
 
 ## 1. Introduction to Next.js
@@ -212,13 +258,13 @@ Uses:
 ### Comparison
 
 | Feature | Pages Router | App Router |
-|---|---||
+|---|---|---|
 | Routing | File-based | File-based |
 | Layouts | Manual | Nested layouts |
 | Data Fetching | Old APIs | async components |
 | Streaming | Limited | Built-in |
 | Server Components | No | Yes |
-| Performance | Good | Better |
+| Performance | Good | Better when optimized |
 | Future Support | Legacy | Recommended |
 
 
