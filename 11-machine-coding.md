@@ -6,22 +6,22 @@
 
 ## 📚 Table of Contents
 
-- [🚀 Introduction](#-introduction)
-- [🎯 What Interviewers Actually Expect](#-what-interviewers-actually-expect)
-- [🧠 Before Solving Any Machine Coding Question](#-before-solving-any-machine-coding-question)
-- [🧩 Machine Coding Mindset](#-machine-coding-mindset)
-- [🏗️ Important Engineering Principles](#️-important-engineering-principles)
-- [🟢 Beginner Machine Coding Questions](#-beginner-machine-coding-questions)
-- [🟡 Intermediate Machine Coding Questions](#-intermediate-machine-coding-questions)
-- [🔴 Advanced Machine Coding Questions](#-advanced-machine-coding-questions)
-- [⚡ Performance Optimization Topics](#-performance-optimization-topics)
-- [♿ Accessibility Checklist](#-accessibility-checklist)
-- [📁 Folder Structure Best Practices](#-folder-structure-best-practices)
-- [🏛️ Recommended Project Architecture](#️-recommended-project-architecture)
-- [❌ Common Interview Mistakes](#-common-interview-mistakes)
-- [🎤 Interview Strategy](#-interview-strategy)
-- [📈 Recommended Preparation Flow](#-recommended-preparation-flow)
-- [🧪 Recommended Additions While Practicing](#-recommended-additions-while-practicing)
+- [1. Introduction](#-introduction)
+- [2. What Interviewers Actually Expect](#-what-interviewers-actually-expect)
+- [3. Before Solving Any Machine Coding Question](#-before-solving-any-machine-coding-question)
+- [4. Machine Coding Mindset](#-machine-coding-mindset)
+- [5. Important Engineering Principles](#️-important-engineering-principles)
+- [6. Beginner Machine Coding Questions](#-beginner-machine-coding-questions)
+- [7. Intermediate Machine Coding Questions](#-intermediate-machine-coding-questions)
+- [8. Advanced Machine Coding Questions](#-advanced-machine-coding-questions)
+- [9. Performance Optimization Topics](#-performance-optimization-topics)
+- [10. Accessibility Checklist](#-accessibility-checklist)
+- [11. Folder Structure Best Practices](#-folder-structure-best-practices)
+- [12. Recommended Project Architecture](#️-recommended-project-architecture)
+- 13. Common Interview Mistakes](#-common-interview-mistakes)
+- [14. Interview Strategy](#-interview-strategy)
+- [15. Recommended Preparation Flow](#-recommended-preparation-flow)
+- [16. Recommended Additions While Practicing](#-recommended-additions-while-practicing)
 
 
 
