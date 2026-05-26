@@ -18,7 +18,7 @@
 - [10. Accessibility Checklist](#-accessibility-checklist)
 - [11. Folder Structure Best Practices](#-folder-structure-best-practices)
 - [12. Recommended Project Architecture](#️-recommended-project-architecture)
-- 13. Common Interview Mistakes](#-common-interview-mistakes)
+- [13. Common Interview Mistakes](#-common-interview-mistakes)
 - [14. Interview Strategy](#-interview-strategy)
 - [15. Recommended Preparation Flow](#-recommended-preparation-flow)
 - [16. Recommended Additions While Practicing](#-recommended-additions-while-practicing)
