@@ -1,94 +1,35 @@
 # Next.js
 
-## 📚 Topics Covered
+## Topics Covered
 
-- [1. Introduction to Next.js](#1-introduction-to-nextjs)
-- [2. Why Next.js is Used in Modern React Applications](#2-why-nextjs-is-used-in-modern-react-applications)
-- [3. Next.js Architecture Overview](#3-nextjs-architecture-overview)
-- [4. App Router vs Pages Router](#4-app-router-vs-pages-router)
-- [5. File-based Routing System](#5-file-based-routing-system)
-- [6. Nested Routing](#6-nested-routing)
-- [7. Dynamic Routes](#7-dynamic-routes)
-- [8. Layouts in Next.js](#8-layouts-in-nextjs)
-- [9. Server Components in Next.js](#9-server-components-in-nextjs)
-- [10. Client Components in Next.js](#10-client-components-in-nextjs)
-- [11. Server vs Client Rendering](#11-server-vs-client-rendering)
-- [12. Rendering Strategies in Next.js](#12-rendering-strategies-in-nextjs)
-- [13. SSR (Server-side Rendering)](#13-ssr-server-side-rendering)
-- [14. SSG (Static Site Generation)](#14-ssg-static-site-generation)
-- [15. ISR (Incremental Static Regeneration)](#15-isr-incremental-static-regeneration)
-- [16. Streaming and Suspense in Next.js](#16-streaming-and-suspense-in-nextjs)
-- [17. Data Fetching in Server Components](#17-data-fetching-in-server-components)
-- [18. Data Fetching in Client Components](#18-data-fetching-in-client-components)
-- [19. Server Actions](#19-server-actions)
-- [20. Route Handlers](#20-route-handlers)
-- [21. Middleware in Next.js](#21-middleware-in-nextjs)
-- [22. Authentication Patterns](#22-authentication-patterns)
-- [23. Caching Mechanisms in Next.js](#23-caching-mechanisms-in-nextjs)
-- [24. Revalidation Strategies](#24-revalidation-strategies)
-- [25. Hydration in Next.js](#25-hydration-in-nextjs)
-- [26. Hydration Mismatch Problems](#26-hydration-mismatch-problems)
-- [27. SEO Optimization in Next.js](#27-seo-optimization-in-nextjs)
-- [28. Metadata API](#28-metadata-api)
-- [29. Image Optimization](#29-image-optimization)
-- [30. Font Optimization](#30-font-optimization)
-- [31. Script Optimization](#31-script-optimization)
-- [32. Code Splitting in Next.js](#32-code-splitting-in-nextjs)
-- [33. Environment Variables](#33-environment-variables)
-- [34. API Layer Architecture in Next.js](#34-api-layer-architecture-in-nextjs)
-- [35. Error Handling in Next.js](#35-error-handling-in-nextjs)
-- [36. Loading UI and Error UI](#36-loading-ui-and-error-ui)
-- [37. Deployment Strategies](#37-deployment-strategies)
-- [38. Edge Runtime Basics](#38-edge-runtime-basics)
-- [39. Performance Optimization in Next.js](#39-performance-optimization-in-nextjs)
-- [40. Common Next.js Production Issues](#40-common-nextjs-production-issues)
-- [41. Next.js Best Practices](#41-nextjs-best-practices)
-- [42. Common Senior-level Interview Questions](#42-common-senior-level-interview-questions)
+- [1. Why Next.js](#1-why-nextjs)
+- [2. App Router vs Pages Router](#2-app-router-vs-pages-router)
+- [3. Routing & Dynamic Routes](#3-routing--dynamic-routes)
+- [4. Layouts](#4-layouts)
+- [5. Server vs Client Components](#5-server-vs-client-components)
+- [6. SSR, SSG, and ISR](#6-ssr-ssg-and-isr)
+- [7. Data Fetching Patterns](#7-data-fetching-patterns)
+- [8. Server Actions](#8-server-actions)
+- [9. Caching & Revalidation](#9-caching--revalidation)
+- [10. Hydration](#10-hydration)
+- [11. Performance Optimization](#11-performance-optimization)
+- [12. Image Optimization](#12-image-optimization)
+- [13. Common Production Issues](#13-common-production-issues)
+- [14. Best Practices](#14-best-practices)
 
 ---
 
+Next.js is a React framework built by Vercel that provides full-stack React capabilities, server-side rendering, static site generation, routing, API handling, performance optimizations, and production-ready architecture. React itself is only a UI library - Next.js adds routing, rendering strategies, backend capabilities, optimization, and deployment support.
 
-## 1. Introduction to Next.js
+---
 
-### What is Next.js?
+## 1. Why Next.js
 
-Next.js is a React framework built by Vercel that provides:
+**Interview Focus:** Understanding the "why" is crucial - commonly asked in architectural discussions.
 
-- Full-stack React capabilities
-- Server-side rendering
-- Static site generation
-- Routing
-- API handling
-- Performance optimizations
-- Production-ready architecture
+Traditional React apps had problems: poor SEO, large bundle sizes, slow initial page load, manual routing setup, and complex webpack configuration. Next.js solved these problems.
 
-React itself is only a UI library.
-
-Next.js adds:
-- routing
-- rendering strategies
-- backend capabilities
-- optimization
-- deployment support
-
-
-
-### Why Next.js Became Popular
-
-Traditional React apps had problems:
-
-- Poor SEO
-- Large bundle sizes
-- Slow initial page load
-- Manual routing setup
-- Complex webpack configuration
-- Difficult server rendering setup
-
-Next.js solved these problems with built-in architecture.
-
-
-
-### Core Features of Next.js
+**Core features:**
 
 | Feature | Purpose |
 |---|---|
@@ -96,166 +37,29 @@ Next.js solved these problems with built-in architecture.
 | SSR | Better SEO + faster initial load |
 | SSG | Pre-render pages at build time |
 | ISR | Update static pages incrementally |
-| API Routes | Backend APIs inside app |
-| Image Optimization | Faster image loading |
-| Middleware | Request interception |
-| Streaming | Progressive UI rendering |
 | Server Components | Reduced client JS |
-| Edge Runtime | Faster global execution |
+| Image Optimization | Faster image loading |
+| Streaming | Progressive UI rendering |
 
+**Main reasons companies use Next.js:**
 
+1. **SEO Optimization:** Server rendering makes content crawlable immediately
+2. **Better Performance:** Faster initial load, Core Web Vitals, code splitting
+3. **Full-stack Capabilities:** Frontend, backend, APIs, auth in one project
+4. **Better DX:** Zero config, automatic routing, fast refresh
+5. **Production Scalability:** Used by Netflix, TikTok, Twitch
 
-## 2. Why Next.js is Used in Modern React Applications
+---
 
-### Main Reasons Companies Use Next.js
+## 2. App Router vs Pages Router
 
-#### 1. SEO Optimization
+**Interview Focus:** Understanding modern Next.js architecture is essential.
 
-Traditional SPA React apps struggle with SEO because content is rendered in the browser.
+**Pages Router (Old):** Located inside `/pages`. Uses `getServerSideProps`, `getStaticProps`, and API routes.
 
-Next.js can render HTML on the server before sending it to the client.
+**App Router (Modern):** Located inside `/app`. Introduced in Next.js 13+. Uses React Server Components, layouts, streaming, nested routing, and server actions.
 
-Good for:
-- Ecommerce
-- Blogs
-- Marketing sites
-- Documentation
-- SaaS landing pages
-
-
-
-#### 2. Better Performance
-
-Next.js improves:
-- Initial load speed
-- Core Web Vitals
-- Bundle size
-- Image loading
-- Code splitting
-
-
-
-#### 3. Full-stack Capabilities
-
-Next.js allows:
-- frontend
-- backend
-- APIs
-- authentication
-- middleware
-
-inside one project.
-
-
-
-#### 4. Better Developer Experience
-
-Next.js provides:
-- zero config
-- automatic routing
-- fast refresh
-- TypeScript support
-- built-in optimization
-
-
-
-#### 5. Production Scalability
-
-Used heavily by:
-- Netflix
-- TikTok
-- Twitch
-- Hulu
-- Notion
-
-because it scales well.
-
-
-
-## 3. Next.js Architecture Overview
-
-Modern Next.js architecture contains:
-
-```text
-Browser
-   ↓
-Next.js Server
-   ↓
-React Server Components
-   ↓
-Data Fetching Layer
-   ↓
-Database / APIs
-```
-
-
-
-### Major Architectural Layers
-
-| Layer | Responsibility |
-|---|---|
-| Routing Layer | URL handling |
-| Rendering Layer | SSR/SSG/CSR |
-| Data Layer | Fetching + caching |
-| Server Layer | APIs + middleware |
-| Client Layer | Interactivity |
-| Edge Layer | Fast request execution |
-
-
-
-### App Directory Architecture
-
-Modern Next.js uses:
-
-```text
-app/
- ├── layout.tsx
- ├── page.tsx
- ├── dashboard/
- │    ├── layout.tsx
- │    ├── page.tsx
- │    └── settings/
-```
-
-
-
-## 4. App Router vs Pages Router
-
-### Pages Router (Old)
-
-Located inside:
-
-```text
-/pages
-```
-
-Uses:
-- getServerSideProps
-- getStaticProps
-- API routes
-
-
-
-### App Router (Modern)
-
-Located inside:
-
-```text
-/app
-```
-
-Introduced in Next.js 13+.
-
-Uses:
-- React Server Components
-- layouts
-- streaming
-- nested routing
-- server actions
-
-
-
-### Comparison
+**Comparison:**
 
 | Feature | Pages Router | App Router |
 |---|---|---|
@@ -267,116 +71,31 @@ Uses:
 | Performance | Good | Better when optimized |
 | Future Support | Legacy | Recommended |
 
+Most new enterprise applications use App Router because of better architecture, lower JS bundle, improved scalability, and React 18 integration.
 
+---
 
-### Senior-level Insight
+## 3. Routing & Dynamic Routes
 
-Most new enterprise applications use App Router because:
-- better architecture
-- lower JS bundle
-- improved scalability
-- React 18 integration
+**Interview Focus:** File-based routing is fundamental - commonly tested in practical exercises.
 
+Each file becomes a route automatically. Example: `app/about/page.tsx` becomes `/about`.
 
+**Nested routing:**
 
-## 5. File-based Routing System
-
-### Concept
-
-Each file becomes a route automatically.
-
-Example:
-
-```text
-app/about/page.tsx
-```
-
-becomes:
-
-```text
-/about
-```
-
-
-
-### Example Structure
-
-```text
-app/
- ├── page.tsx
- ├── about/
- │    └── page.tsx
- ├── contact/
- │    └── page.tsx
-```
-
-Routes:
-- `/`
-- `/about`
-- `/contact`
-
-
-
-### Benefits
-
-- No manual route configuration
-- Easier scalability
-- Predictable architecture
-
-
-
-## 6. Nested Routing
-
-### What is Nested Routing?
-
-Routes can exist inside routes.
-
-Example:
-
-```text
-/dashboard/settings
-```
-
-Folder structure:
-
-```text
+```txt
 app/
  └── dashboard/
-      ├── page.tsx
+      ├── page.tsx           → /dashboard
       └── settings/
-           └── page.tsx
+           └── page.tsx      → /dashboard/settings
 ```
 
+**Dynamic routes:**
 
+Dynamic URL segments like `/products/123`. Folder: `app/products/[id]/page.tsx`.
 
-### Benefits
-
-- Better organization
-- Shared layouts
-- Independent loading states
-
-
-
-## 7. Dynamic Routes
-
-### Dynamic URL Segments
-
-Example:
-
-```text
-/products/123
-/products/456
-```
-
-Folder:
-
-```text
-app/products/[id]/page.tsx
-```
-
-
-
-### Accessing Params
+Accessing params:
 
 ```tsx
 export default function ProductPage({
@@ -384,40 +103,19 @@ export default function ProductPage({
 }: {
   params: { id: string };
 }) {
-  return <div>{params.id}</div>;
+  return <div>Product {params.id}</div>;
 }
 ```
 
+**Catch-all routes:** `[...slug]` for routes like `/docs/react/hooks/useEffect`.
 
+---
 
-### Catch-all Routes
+## 4. Layouts
 
-```text
-[...slug]
-```
+**Interview Focus:** Understanding layouts is key to Next.js architecture.
 
-Example:
-
-```text
-/docs/react/hooks/useEffect
-```
-
-
-
-## 8. Layouts in Next.js
-
-### What are Layouts?
-
-Layouts are shared UI wrappers.
-
-Example:
-- navbar
-- sidebar
-- footer
-
-
-
-### Example
+Layouts are shared UI wrappers like navbar, sidebar, and footer:
 
 ```tsx
 export default function DashboardLayout({
@@ -434,33 +132,27 @@ export default function DashboardLayout({
 }
 ```
 
+**Benefits:**
+- Persistent UI - doesn't re-render on navigation
+- Nested layouts - different sections can have different layouts
+- Better UX - smooth transitions
 
+---
 
-### Benefits
+## 5. Server vs Client Components
 
-- Persistent UI
-- Avoid re-rendering
-- Better UX
+**Interview Focus:** Critical concept - understanding the boundary is essential for senior roles.
 
-
-
-## 9. Server Components in Next.js
-
-### What are Server Components?
-
-Components rendered on the server by default.
+**Server Components (default):** Rendered on the server.
 
 ```tsx
 export default async function Page() {
   const data = await fetchData();
-
   return <div>{data.title}</div>;
 }
 ```
 
-
-
-### Benefits
+**Benefits:**
 
 | Benefit | Reason |
 |---|---|
@@ -469,32 +161,9 @@ export default async function Page() {
 | Direct DB access | Safer |
 | Faster initial load | HTML streamed |
 
+**Important rule:** Server Components cannot use `useState`, `useEffect`, or browser APIs.
 
-
-### Important Rule
-
-Server Components:
-- cannot use useState
-- cannot use useEffect
-- cannot access browser APIs
-
-
-
-## 10. Client Components in Next.js
-
-### What are Client Components?
-
-Interactive browser-side components.
-
-Must use:
-
-```tsx
-"use client";
-```
-
-
-
-### Example
+**Client Components:** Interactive browser-side components. Must use `"use client"`:
 
 ```tsx
 "use client";
@@ -503,7 +172,6 @@ import { useState } from "react";
 
 export default function Counter() {
   const [count, setCount] = useState(0);
-
   return (
     <button onClick={() => setCount(count + 1)}>
       {count}
@@ -512,54 +180,17 @@ export default function Counter() {
 }
 ```
 
+Use client components for: state, effects, event handlers, browser APIs, animations.
 
+**Interview insight:** Best practice is to default to server and move only interactive parts to client. This minimizes JS bundle size.
 
-### When to Use Client Components
+---
 
-Use for:
-- state
-- effects
-- event handlers
-- browser APIs
-- animations
+## 6. SSR, SSG, and ISR
 
+**Interview Focus:** Core rendering strategies - commonly asked in architectural discussions.
 
-
-## 11. Server vs Client Rendering
-
-### Server Rendering
-
-HTML generated on server.
-
-Advantages:
-- SEO
-- faster first paint
-
-
-
-### Client Rendering
-
-Browser downloads JS first.
-
-Advantages:
-- interactive apps
-- dynamic UI
-
-
-
-### Interview Insight
-
-Best practice:
-- default to server
-- move only interactive parts to client
-
-This minimizes JS bundle size.
-
-
-
-## 12. Rendering Strategies in Next.js
-
-Next.js supports multiple rendering modes.
+**Rendering strategies:**
 
 | Strategy | When Rendering Happens |
 |---|---|
@@ -568,159 +199,57 @@ Next.js supports multiple rendering modes.
 | SSG | Build time |
 | ISR | Build + incremental updates |
 
-
-
-## 13. SSR (Server-side Rendering)
-
-### What is SSR?
-
-Page generated on every request.
-
-Example:
+**SSR (Server-side Rendering):** Page generated on every request.
 
 ```tsx
 export default async function Page() {
   const data = await fetch(API, {
-    cache: "no-store",
+    cache: "no-store", // force SSR
   });
 
   return <div>SSR Page</div>;
 }
 ```
 
+Use cases: personalized dashboards, authenticated pages, frequently changing data. Drawback: higher server cost.
 
+**SSG (Static Site Generation):** Pages generated during build time. Extremely fast, CDN cacheable, cheap hosting. Use cases: blogs, docs, marketing pages.
 
-### Use Cases
-
-- personalized dashboards
-- authenticated pages
-- frequently changing data
-
-
-
-### Drawback
-
-Higher server cost.
-
-
-
-## 14. SSG (Static Site Generation)
-
-### What is SSG?
-
-Pages generated during build time.
-
-
-
-### Benefits
-
-- extremely fast
-- CDN cacheable
-- cheap hosting
-
-
-
-### Use Cases
-
-- blogs
-- docs
-- marketing pages
-
-
-
-## 15. ISR (Incremental Static Regeneration)
-
-### What is ISR?
-
-Allows static pages to update periodically.
-
-
-
-### Example
+**ISR (Incremental Static Regeneration):** Allows static pages to update periodically.
 
 ```tsx
 fetch(API, {
   next: {
-    revalidate: 60,
+    revalidate: 60, // refresh every 60 seconds
   },
 });
 ```
 
-Page refreshes every 60 seconds.
+Production advantage: combines static speed with dynamic freshness.
 
+---
 
+## 7. Data Fetching Patterns
 
-### Production Advantage
+**Interview Focus:** Modern data fetching is essential - commonly tested.
 
-Combines:
-- static speed
-- dynamic freshness
-
-
-
-## 16. Streaming and Suspense in Next.js
-
-### Problem Before Streaming
-
-Users waited for entire page data before seeing UI.
-
-
-
-### Streaming Solution
-
-Send UI in chunks.
-
-
-
-### Example
-
-```tsx
-<Suspense fallback={<Loading />}>
-  <Products />
-</Suspense>
-```
-
-
-
-### Benefits
-
-- Faster perceived performance
-- Better UX
-- Progressive rendering
-
-
-
-## 17. Data Fetching in Server Components
-
-### Example
+**In Server Components:**
 
 ```tsx
 async function getUsers() {
   const res = await fetch(API);
-
   return res.json();
 }
 
 export default async function Page() {
   const users = await getUsers();
-
   return <Users users={users} />;
 }
 ```
 
+Advantages: no client fetching, better security, reduced bundle size.
 
-
-### Advantages
-
-- No client fetching
-- Better security
-- Reduced bundle size
-
-
-
-## 18. Data Fetching in Client Components
-
-### Example
+**In Client Components:**
 
 ```tsx
 "use client";
@@ -730,61 +259,42 @@ useEffect(() => {
 }, []);
 ```
 
+**Best practice:** Prefer Server Components for initial data; Client Components for live updates.
 
+**Streaming and Suspense:**
 
-### Best Practice
+```tsx
+<Suspense fallback={<Loading />}>
+  <Products />
+</Suspense>
+```
 
-Prefer:
-- Server Components for initial data
-- Client Components for live updates
+Benefits: faster perceived performance, better UX, progressive rendering.
 
+---
 
+## 8. Server Actions
 
-## 19. Server Actions
+**Interview Focus:** Modern pattern - shows understanding of full-stack Next.js.
 
-### What are Server Actions?
-
-Functions executed directly on server.
-
-
-
-### Example
+Functions executed directly on server:
 
 ```tsx
 "use server";
 
-export async function createUser() {
-  await db.user.create();
+export async function createUser(formData: FormData) {
+  await db.user.create({
+    name: formData.get("name"),
+  });
 }
 ```
 
+Benefits: no separate API endpoint, simplified architecture, better security.
 
-
-### Benefits
-
-- No separate API endpoint
-- Simplified architecture
-- Better security
-
-
-
-## 20. Route Handlers
-
-### What are Route Handlers?
-
-Backend endpoints inside app router.
-
-Example:
-
-```text
-app/api/users/route.ts
-```
-
-
-
-### Example
+**Route Handlers** - backend endpoints inside app router:
 
 ```tsx
+// app/api/users/route.ts
 export async function GET() {
   return Response.json({
     users: [],
@@ -792,59 +302,39 @@ export async function GET() {
 }
 ```
 
-
-
-## 21. Middleware in Next.js
-
-### What is Middleware?
-
-Runs before request completion.
-
-
-
-### Common Use Cases
-
-- authentication
-- redirects
-- geolocation
-- rate limiting
-
-
-
-### Example
+**Middleware** — runs code before a request is completed:
 
 ```tsx
-export function middleware(request) {
+// middleware.ts (at project root)
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("auth-token");
+
+  if (!token && request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};
 ```
 
+Middleware runs on every matching request — before the page renders. Use cases: authentication redirects, A/B testing, geolocation-based routing, request logging.
 
+**Key difference from Server Actions:** Middleware runs before the page loads; Server Actions run during user interactions (form submits, button clicks).
 
-## 22. Authentication Patterns
+---
 
-### Common Approaches
+## 9. Caching & Revalidation
 
-| Method | Usage |
-|---|---|
-| JWT | APIs |
-| Session Cookies | Secure auth |
-| OAuth | Google/GitHub login |
-| Auth Providers | Clerk/Auth.js |
+**Interview Focus:** Critical production concept - caching mistakes cause major issues.
 
-
-
-### Modern Pattern
-
-- auth in middleware
-- session validation on server
-- protected layouts
-
-
-
-## 23. Caching Mechanisms in Next.js
-
-### Types of Cache
+**Caching layers:**
 
 | Cache | Purpose |
 |---|---|
@@ -853,376 +343,72 @@ export function middleware(request) {
 | Full Route Cache | Cache HTML |
 | Router Cache | Client-side cache |
 
+**Revalidation strategies:**
 
-
-### Senior Insight
-
-Caching mistakes are major production issues.
-
-Understand:
-- stale data
-- invalidation
-- revalidation
-
-deeply.
-
-
-
-## 24. Revalidation Strategies
-
-### Time-based Revalidation
+**Time-based:**
 
 ```tsx
-revalidate: 60
+fetch(API, {
+  next: { revalidate: 60 }
+});
 ```
 
-
-
-### On-demand Revalidation
+**On-demand:**
 
 ```tsx
 revalidateTag("products");
 ```
 
+**Interview insight:** Caching mistakes are major production issues. Understand stale data, invalidation, and revalidation deeply.
 
+---
 
-### Production Use
+## 10. Hydration
 
-Useful for:
-- CMS updates
-- ecommerce inventory
-- dashboards
+**Interview Focus:** Understanding hydration issues is common in senior interviews.
 
+**What is hydration?** When Next.js renders a page on the server, it sends HTML to the browser. The user sees content immediately. But that HTML is "static" — no event handlers attached yet. Hydration is the process where React downloads the JavaScript, runs it, and "attaches" interactivity (event listeners, state, etc.) to the existing HTML.
 
+Think of it as: server sends a static picture → React makes it interactive.
 
-## 25. Hydration in Next.js
-
-### What is Hydration?
-
-React attaches event handlers to server-rendered HTML.
-
-
-
-### Flow
-
-```text
-Server HTML
-   ↓
-Browser Downloads JS
-   ↓
-React Hydrates
-   ↓
-Interactive UI
+```txt
+Server HTML → Browser Downloads JS → React Hydrates → Interactive UI
 ```
 
+**Hydration mismatch problems:** The server rendered HTML and the first client render must produce identical output. If they differ, React throws a hydration error and replaces the server HTML with the client version — causing a flash, or worse, a crash.
 
+**Root cause:** You're running code during render that produces different results on server vs client.
 
-## 26. Hydration Mismatch Problems
-
-### What Causes Mismatch?
-
-Server HTML differs from client HTML.
-
-
-
-### Common Causes
+Common causes:
 
 | Cause | Example |
 |---|---|
 | Date.now() | Different timestamps |
-| Random values | Math.random() |
-| Browser APIs | window object |
-| Conditional rendering | Different states |
+| Math.random() | Random values |
+| window object | Browser APIs — doesn't exist on server |
+| Conditional rendering | `typeof window !== "undefined"` checks |
 
+**Fixes:**
+- Move browser-only logic into `useEffect` (runs client-only, after hydration)
+- Use `dynamic(() => import("./Component"), { ssr: false })` for browser-only components
+- Avoid random values during initial render
 
+```jsx
+// Bad - causes mismatch: server has no window
+const isDesktop = window.innerWidth > 768;
 
-### Fixes
-
-- move browser logic into useEffect
-- avoid random values during SSR
-- use dynamic imports
-
-
-
-## 27. SEO Optimization in Next.js
-
-### Why SEO is Better
-
-Next.js sends pre-rendered HTML.
-
-Search engines can crawl content immediately.
-
-
-
-### SEO Best Practices
-
-- metadata optimization
-- semantic HTML
-- sitemap
-- robots.txt
-- structured data
-
-
-
-## 28. Metadata API
-
-### Example
-
-```tsx
-export const metadata = {
-  title: "Dashboard",
-  description: "Admin dashboard",
-};
+// Good - runs only on client, after hydration
+const [isDesktop, setIsDesktop] = useState(false);
+useEffect(() => {
+  setIsDesktop(window.innerWidth > 768);
+}, []);
 ```
 
+---
 
+## 11. Performance Optimization
 
-### Dynamic Metadata
-
-```tsx
-export async function generateMetadata() {
-  return {
-    title: "Product",
-  };
-}
-```
-
-
-
-## 29. Image Optimization
-
-### Using next/image
-
-```tsx
-import Image from "next/image";
-```
-
-
-
-### Benefits
-
-- lazy loading
-- responsive images
-- automatic optimization
-- modern formats
-
-
-
-### Interview Insight
-
-Using regular `<img>` in production is usually considered a mistake in Next.js apps.
-
-
-
-## 30. Font Optimization
-
-### next/font
-
-```tsx
-import { Inter } from "next/font/google";
-```
-
-
-
-### Benefits
-
-- no layout shift
-- self-hosted fonts
-- optimized loading
-
-
-
-## 31. Script Optimization
-
-### next/script
-
-Allows:
-- lazy loading
-- defer loading
-- priority control
-
-
-
-### Example
-
-```tsx
-<Script
-  src="analytics.js"
-  strategy="lazyOnload"
-/>
-```
-
-
-
-## 32. Code Splitting in Next.js
-
-### Automatic Code Splitting
-
-Next.js splits bundles automatically by route.
-
-
-
-### Dynamic Imports
-
-```tsx
-const Chart = dynamic(() => import("./Chart"));
-```
-
-
-
-### Benefits
-
-- smaller initial bundle
-- faster load times
-
-
-
-## 33. Environment Variables
-
-### Example
-
-```env
-DATABASE_URL=abc
-NEXT_PUBLIC_API=xyz
-```
-
-
-
-### Important Rule
-
-Only variables prefixed with:
-
-```text
-NEXT_PUBLIC_
-```
-
-are exposed to browser.
-
-
-
-## 34. API Layer Architecture in Next.js
-
-### Common Architecture
-
-```text
-Client
-   ↓
-Server Actions / Route Handlers
-   ↓
-Service Layer
-   ↓
-Database
-```
-
-
-
-### Best Practice
-
-Never place DB logic directly in components.
-
-Use:
-- services
-- repositories
-- validation layers
-
-
-
-## 35. Error Handling in Next.js
-
-### Error Boundaries
-
-Use:
-
-```text
-error.tsx
-```
-
-inside route segment.
-
-
-
-### Example
-
-```tsx
-"use client";
-
-export default function Error() {
-  return <div>Error occurred</div>;
-}
-```
-
-
-
-## 36. Loading UI and Error UI
-
-### Loading UI
-
-```text
-loading.tsx
-```
-
-automatically works with Suspense.
-
-
-
-### Benefits
-
-- instant feedback
-- skeleton loading
-- better UX
-
-
-
-## 37. Deployment Strategies
-
-### Common Platforms
-
-| Platform | Usage |
-|---|---|
-| Vercel | Most optimized |
-| Netlify | Static hosting |
-| AWS | Enterprise infra |
-| Docker | Container deployment |
-
-
-
-### Production Considerations
-
-- CDN
-- caching
-- edge locations
-- observability
-- logging
-
-
-
-## 38. Edge Runtime Basics
-
-### What is Edge Runtime?
-
-Code runs near users globally.
-
-
-
-### Benefits
-
-- lower latency
-- faster response
-- better scalability
-
-
-
-### Common Use Cases
-
-- middleware
-- personalization
-- redirects
-
-
-
-## 39. Performance Optimization in Next.js
-
-### Major Optimization Areas
+**Interview Focus:** Performance is a key senior-level topic.
 
 | Area | Optimization |
 |---|---|
@@ -1233,20 +419,58 @@ Code runs near users globally.
 | Rendering | streaming |
 | Navigation | prefetching |
 
+**Code splitting:** Next.js splits bundles automatically by route. Dynamic imports:
 
+```tsx
+const Chart = dynamic(() => import("./Chart"));
+```
 
-### Senior-level Insight
+Benefits: smaller initial bundle, faster load times.
 
-Performance optimization is mostly:
-- reducing JS
-- reducing hydration
-- reducing unnecessary client components
+**Senior-level insight:** Performance optimization is mostly reducing JS, reducing hydration, and reducing unnecessary client components.
 
+---
 
+## 12. Image Optimization
 
-## 40. Common Next.js Production Issues
+**Interview Focus:** next/image is fundamental - commonly tested.
 
-### Common Problems
+Using `next/image`:
+
+```tsx
+import Image from "next/image";
+
+<Image
+  src="/photo.jpg"
+  alt="Photo"
+  width={500}
+  height={300}
+/>
+```
+
+**Benefits:**
+- Lazy loading - images load as user scrolls
+- Responsive images - different sizes for different screens
+- Automatic optimization - converts to WebP/AVIF
+- Modern formats - better compression
+
+**Interview insight:** Using regular `<img>` in production is usually considered a mistake in Next.js apps.
+
+**Font optimization:**
+
+```tsx
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+```
+
+Benefits: no layout shift, self-hosted fonts, optimized loading.
+
+---
+
+## 13. Common Production Issues
+
+**Interview Focus:** Real-world experience - demonstrates production knowledge.
 
 | Problem | Cause |
 |---|---|
@@ -1257,133 +481,88 @@ Performance optimization is mostly:
 | Memory leaks | Persistent server processes |
 | SEO issues | Wrong metadata |
 
+**Real-world senior insight:** Most production problems are caching issues, rendering misunderstandings, and client/server boundary mistakes.
 
+---
 
-### Real-world Senior Insight
+## 14. Best Practices
 
-Most production problems are:
-- caching issues
-- rendering misunderstandings
-- client/server boundary mistakes
+**Interview Focus:** Senior-level expectations - demonstrates production maturity.
 
+**1. Prefer Server Components:**
 
+Move only interactive parts to client. This minimizes JS bundle.
 
-## 41. Next.js Best Practices
+**2. Keep Client Bundle Small:**
 
-### Recommended Practices
+Avoid unnecessary libraries, state management, and browser JS.
 
-#### 1. Prefer Server Components
+**3. Use Proper Caching:**
 
-Move only interactive parts to client.
+Understand static, dynamic, and revalidation properly.
 
+**4. Use Suspense Boundaries:**
 
+Improves loading UX and perceived performance.
 
-#### 2. Keep Client Bundle Small
+**5. Optimize Images and Fonts:**
 
-Avoid unnecessary:
-- libraries
-- state management
-- browser JS
+Always use next/image and next/font.
 
+**6. Protect Sensitive Logic:**
 
+Never expose secrets to client. Server Actions and Route Handlers keep logic secure.
 
-#### 3. Use Proper Caching
+**7. Separate Layers:**
 
-Understand:
-- static
-- dynamic
-- revalidation
+Maintain UI layer, service layer, and database layer.
 
-properly.
+**8. Environment Variables:**
 
+```env
+DATABASE_URL=abc
+NEXT_PUBLIC_API=xyz
+```
 
+Only variables prefixed with `NEXT_PUBLIC_` are exposed to browser.
 
-#### 4. Use Suspense Boundaries
+**Common Senior Interview Questions:**
 
-Improves loading UX.
+**Core Architecture:**
+- Why is Next.js better than traditional React SPA?
+- Explain App Router architecture
+- Difference between Server and Client Components?
+- Why are Server Components important?
 
+**Rendering:**
+- Explain SSR vs SSG vs ISR
+- When would you choose SSR?
+- What causes hydration mismatch?
+- Explain streaming in React 18
 
+**Performance:**
+- How does Next.js optimize performance?
+- How does code splitting work?
+- How do Server Components reduce bundle size?
 
-#### 5. Optimize Images and Fonts
+**Caching:**
+- Explain Next.js caching layers
+- Difference between revalidation and cache invalidation?
+- Explain stale data problems
 
-Always use:
-- next/image
-- next/font
+**Production:**
+- Common production issues in Next.js?
+- How do you structure enterprise-scale Next.js apps?
+- How would you optimize Core Web Vitals?
+- How do you debug hydration issues?
 
+---
 
-
-#### 6. Protect Sensitive Logic
-
-Never expose secrets to client.
-
-
-
-#### 7. Separate Layers
-
-Maintain:
-- UI layer
-- service layer
-- database layer
-
-
-
-## 42. Common Senior-level Interview Questions
-
-### Core Architecture
-
-1. Why is Next.js better than traditional React SPA?
-2. Explain App Router architecture.
-3. Difference between Server and Client Components?
-4. Why are Server Components important?
-
-
-
-### Rendering
-
-5. Explain SSR vs SSG vs ISR.
-6. When would you choose SSR?
-7. What causes hydration mismatch?
-8. Explain streaming in React 18.
-
-
-
-### Performance
-
-9. How does Next.js optimize performance?
-10. How does code splitting work?
-11. How do Server Components reduce bundle size?
-
-
-
-### Caching
-
-12. Explain Next.js caching layers.
-13. Difference between revalidation and cache invalidation?
-14. Explain stale data problems.
-
-
-
-### Authentication
-
-15. How would you protect routes?
-16. Explain middleware-based authentication.
-
-
-
-### Production
-
-17. Common production issues in Next.js?
-18. How do you structure enterprise-scale Next.js apps?
-19. How would you optimize Core Web Vitals?
-20. How do you debug hydration issues?
-
-
-
-## Final Senior-level Interview Advice
+## Final Takeaway
 
 For senior interviews, focus deeply on:
 
-| High-value Topic | Importance |
+| Topic | Importance |
 |---|---|
 | Rendering strategies | Extremely important |
 | Server Components | Very important |
@@ -1391,11 +570,5 @@ For senior interviews, focus deeply on:
 | Hydration | Frequently asked |
 | Performance optimization | Critical |
 | Architecture decisions | Senior-level expectation |
-| App Router | Modern standard |
 
-Most companies expect senior engineers to understand:
-- why a rendering strategy is chosen
-- performance tradeoffs
-- caching architecture
-- client/server boundaries
-- production scalability
+Most companies expect senior engineers to understand why a rendering strategy is chosen, performance tradeoffs, caching architecture, client/server boundaries, and production scalability.

@@ -1,1064 +1,370 @@
 # Frontend Machine Coding Interview Preparation
 
-> Complete machine coding roadmap for frontend developers preparing for product-based companies, startups, and senior frontend interviews.
+> Machine coding interviews test your ability to build scalable, production-ready UI — not just working code.
 
+## Table of Contents
 
+- [1. How to Approach Machine Coding](#1-how-to-approach-machine-coding)
+- [2. Before You Start Coding](#2-before-you-start-coding)
+- [3. Beginner Questions](#3-beginner-questions)
+- [4. Intermediate Questions](#4-intermediate-questions)
+- [5. Advanced Questions](#5-advanced-questions)
+- [6. Common Mistakes](#6-common-mistakes)
+- [7. Preparation Plan](#7-preparation-plan)
 
-## 📚 Table of Contents
+---
 
-- [1. Introduction](#-introduction)
-- [2. What Interviewers Actually Expect](#-what-interviewers-actually-expect)
-- [3. Before Solving Any Machine Coding Question](#-before-solving-any-machine-coding-question)
-- [4. Machine Coding Mindset](#-machine-coding-mindset)
-- [5. Important Engineering Principles](#️-important-engineering-principles)
-- [6. Beginner Machine Coding Questions](#-beginner-machine-coding-questions)
-- [7. Intermediate Machine Coding Questions](#-intermediate-machine-coding-questions)
-- [8. Advanced Machine Coding Questions](#-advanced-machine-coding-questions)
-- [9. Performance Optimization Topics](#-performance-optimization-topics)
-- [10. Accessibility Checklist](#-accessibility-checklist)
-- [11. Folder Structure Best Practices](#-folder-structure-best-practices)
-- [12. Recommended Project Architecture](#️-recommended-project-architecture)
-- [13. Common Interview Mistakes](#-common-interview-mistakes)
-- [14. Interview Strategy](#-interview-strategy)
-- [15. Recommended Preparation Flow](#-recommended-preparation-flow)
-- [16. Recommended Additions While Practicing](#-recommended-additions-while-practicing)
+## 1. How to Approach Machine Coding
 
+For a 4 YOE developer, interviewers don't just check if the UI works. They evaluate:
 
+- **Architecture thinking** — how you break the problem into components
+- **State design** — what lives locally vs globally, derived vs stored state
+- **Performance awareness** — do you think about re-renders, memoization, virtualization
+- **Edge case handling** — loading, error, empty states
+- **Code quality** — readable, reusable, maintainable
+- **Accessibility** — semantic HTML, keyboard nav, ARIA labels
 
-## 🚀 Introduction
+The mindset shift: think like a **product engineer** building for production, not a developer completing a task.
 
-Machine coding interviews are designed to evaluate:
+---
 
-- Problem-solving ability
-- UI architecture thinking
-- Code organization
-- State management
-- Performance optimization
-- Accessibility awareness
-- Scalability thinking
-- Real-world frontend engineering skills
+## 2. Before You Start Coding
 
-For an **experienced frontend developer**, interviewers do not only expect working UI.
+**The first 5 minutes matter most.** Don't start coding immediately — this alone separates experienced developers.
 
-They expect:
-- scalable architecture
-- reusable components
-- optimized rendering
-- clean state management
-- maintainable code
-- production-ready thinking
+**Step 1: Clarify requirements**
 
+Ask these questions before writing a single line:
+- What features are mandatory vs optional?
+- Does it need API integration or mock data?
+- Does it need persistence (localStorage)?
+- Mobile responsive?
+- Accessibility requirements?
+- What happens on error/empty/loading states?
 
-
-## 🎯 What Interviewers Actually Expect
-
-### ❌ Not Expected
+**Step 2: Break into components**
 
 ```txt
-Just completing the UI
-```
-
-
-
-### ✅ Expected
-
-```txt
-Can design scalable frontend systems
-Can manage complex state
-Can optimize performance
-Can think about edge cases
-Can write maintainable code
-Can create reusable architecture
-Can build production-ready UI
-```
-
-
-
-## 🧠 Before Solving Any Machine Coding Question
-
-
-
-### 1. Understand Requirements Properly
-
-Never start coding immediately.
-
-Always clarify:
-- mandatory features
-- optional features
-- API integration
-- persistence requirements
-- responsiveness
-- accessibility
-- edge cases
-- keyboard interactions
-- loading states
-- empty states
-- error handling
-
-
-
-### 2. Break Problem into Components
-
-Interviewers observe:
-- component thinking
-- modularity
-- separation of concerns
-
-
-
-#### Example
-
-Instead of:
-
-```txt
-One giant component
-```
-
-Think like:
-
-```txt
+Example: Kanban Board
 Board
 ├── Column
 │   ├── Card
 │   ├── AddCard
 │   └── CardMenu
 ├── Filters
-├── Search
-├── Modal
-└── Sidebar
+└── Modal
 ```
 
+**Step 3: Plan your state**
+- What state is local vs shared?
+- Use Context or prop drilling?
+- Any derived state that shouldn't be stored?
+- Any async/server state?
 
+**Step 4: Talk through performance** (even if not asked)
+- Will any list need virtualization?
+- Any heavy calculations needing `useMemo`?
+- Any callbacks passed to memoized children?
 
-### 3. Think About State Management
+**Step 5: Time management — plan your 30/45 minutes**
 
-Before coding, decide:
+| Time | What to do |
+|---|---|
+| 0-5 min | Clarify, plan architecture, announce your approach |
+| 5-15 min | Core structure — components, state, routing skeleton |
+| 15-30 min | Core features working end-to-end |
+| 30-40 min | Edge cases (loading, error, empty states), accessibility |
+| 40-45 min | Polish, performance mentions, cleanup |
 
-- local state vs global state
-- Context API vs Redux vs Zustand
-- derived state
-- memoization
-- server cache
-- optimistic updates
+**If time runs out:** finish the core flow first. A working Todo CRUD beats a half-finished Trello clone. State this to the interviewer: "I'll implement the core flow first, then add error handling and pagination."
 
+**Step 6: Start with structure, then features**
+Build the skeleton first (components + state), then fill in logic. Don't jump to edge cases before core flow works.
 
+---
 
-### 4. Think About Scalability
+## 3. Beginner Questions
 
-Ask yourself:
-
-```txt
-What if this app grows 10x?
-```
-
-Avoid:
-- prop drilling everywhere
-- repeated logic
-- duplicated API calls
-- massive components
-
-
-
-### 5. Think About Performance
-
-Interviewers LOVE this.
-
-Always consider:
-- unnecessary re-renders
-- memoization
-- lazy loading
-- virtualization
-- debounce/throttle
-- pagination
-- code splitting
-
-
-
-### 6. Think About Accessibility
-
-Most candidates ignore accessibility.
-
-Take care of:
-- semantic HTML
-- keyboard navigation
-- focus management
-- aria-labels
-- contrast ratio
-- screen readers
-
-
-
-### 7. Think About Error Handling
-
-Always handle:
-- API failures
-- invalid inputs
-- race conditions
-- empty states
-- loading states
-
-
-
-### 8. Think About Responsive Design
-
-UI should work on:
-- mobile
-- tablet
-- desktop
-
-Use:
-- Flexbox
-- Grid
-- responsive layouts
-
-
-
-## 🧩 Machine Coding Mindset
-
-
-
-### Think Like a Product Engineer
-
-Not:
-
-```txt
-Can I finish the UI?
-```
-
-Instead:
-
-```txt
-Can this survive production?
-```
-
-
-
-## 🏗️ Important Engineering Principles
-
-
-
-### 1. Reusability
-
-Avoid duplicated code.
-
-Good:
-
-```txt
-Reusable Button Component
-Reusable Modal
-Reusable Table
-Reusable Input
-```
-
-Bad:
-
-```txt
-Copy-pasted components everywhere
-```
-
-
-
-### 2. Maintainability
-
-Code should be:
-- readable
-- modular
-- scalable
-- easy to debug
-
-
-
-### 3. Separation of Concerns
-
-Separate:
-- UI
-- business logic
-- API calls
-- utilities
-- state
-
-
-
-### 4. Scalability
-
-Applications should support:
-- feature expansion
-- team collaboration
-- large datasets
-- future requirements
-
-
-
-### 5. Performance
-
-Optimize:
-- rendering
-- network requests
-- state updates
-- list rendering
-
-
-
-## 🟢 Beginner Machine Coding Questions
-
-> Goal: Build confidence and component thinking.
-
-
+> Goal: Component thinking, basic state, event handling.
 
 ### 1. Counter App
+**Concepts:** useState, event handling  
+**Add:** keyboard shortcuts (+/- keys), localStorage persistence, min/max limits
 
-#### Features
-- increment/decrement/reset
-- keyboard shortcuts
-- persistence
-
-#### Concepts
-- state management
-- event handling
-
-
-
-### 2. Theme Toggle App
-
-#### Features
-- dark/light mode
-- localStorage persistence
-
-#### Concepts
-- Context API
-- global state
-
-
+### 2. Theme Toggle (Dark/Light Mode)
+**Concepts:** Context API, localStorage, CSS variables  
+**Add:** System preference detection (`prefers-color-scheme`)
 
 ### 3. Todo App
-
-#### Features
-- CRUD operations
-- filters
-- search
-- persistence
-
-#### Concepts
-- list rendering
-- immutable updates
-
-
+**Concepts:** CRUD, list rendering, immutable updates, filters  
+**Add:** localStorage persistence, search, priority sorting
 
 ### 4. Accordion Component
-
-#### Features
-- single open
-- multiple open
-- animations
-
-#### Concepts
-- reusable UI
-
-
+**Concepts:** Reusable UI, controlled/uncontrolled, state isolation  
+**Add:** Single-open vs multi-open mode, smooth animation
 
 ### 5. Tabs Component
-
-#### Features
-- keyboard navigation
-- dynamic tabs
-
-#### Concepts
-- accessibility
-
-
+**Concepts:** Controlled component, accessibility  
+**Add:** Keyboard navigation (arrow keys), lazy loading tab content
 
 ### 6. Modal Component
-
-#### Features
-- ESC close
-- outside click close
-- focus trap
-
-#### Concepts
-- portals
-- event bubbling
-
-
+**Concepts:** Portals, event bubbling, focus trap  
+**Add:** ESC to close, click outside to close, scroll lock on body
 
 ### 7. OTP Input Component
-
-#### Features
-- auto-focus
-- paste handling
-- backspace navigation
-
-#### Concepts
-- refs
-- keyboard events
-
-
+**Concepts:** useRef, controlled inputs, keyboard events  
+**Add:** Auto-focus next input, paste handling, backspace to go back
 
 ### 8. Star Rating Component
-
-#### Features
-- hover preview
-- controlled/uncontrolled modes
-
-#### Concepts
-- reusable state logic
-
-
+**Concepts:** Controlled vs uncontrolled, hover state  
+**Add:** Half-star support, read-only mode, accessible with keyboard
 
 ### 9. Progress Bar
+**Concepts:** CSS transitions, dynamic state  
+**Add:** Animated fill, step-based progress, color thresholds
 
-#### Features
-- animation
-- dynamic progress
+### 10. Infinite Scroll
+**Concepts:** Intersection Observer, pagination, loading states  
+**Add:** Debounced scroll, skeleton loader, error retry
 
-#### Concepts
-- transitions
-- animations
+---
 
+## 4. Intermediate Questions
 
+> Goal: Real interview-level — architecture, async, scalable state.
 
-### 10. Infinite Scroll List
-
-#### Features
-- pagination
-- lazy loading
-
-#### Concepts
-- Intersection Observer
-
-
-
-## 🟡 Intermediate Machine Coding Questions
-
-> Goal: Real interview-level preparation.
-
-
-
-### 1. File Explorer
-
-#### Features
-- nested folders
-- recursive rendering
-- expand/collapse
-
-#### Concepts
-- recursion
-- tree rendering
-
-
+### 1. File Explorer (Nested Folders)
+**Concepts:** Recursive components, tree rendering, expand/collapse  
+**Add:** Search/filter, rename, delete, drag-and-drop reorder
 
 ### 2. Kanban Board
+**Concepts:** Complex state management, drag-and-drop, optimistic updates  
+**Add:** Column-level limits, card filtering, localStorage persistence
 
-#### Features
-- drag & drop
-- reorder
-- persistence
+### 3. Autocomplete Search
+**Concepts:** Debouncing, async API, caching, race condition handling  
+**Add:** Keyboard navigation in dropdown, highlight matched text, loading state
 
-#### Concepts
-- complex state management
-
-
-
-### 3. Chat Application UI
-
-#### Features
-- typing indicator
-- grouped messages
-- scroll management
-
-#### Concepts
-- realtime UI thinking
-
-
-
-### 4. Data Table
-
-#### Features
-- sorting
-- filtering
-- pagination
-- row selection
-
-#### Concepts
-- optimized rendering
-
-
+### 4. Data Table with Sort/Filter/Pagination
+**Concepts:** Derived state, optimized rendering, controlled inputs  
+**Add:** Multi-column sort, column visibility toggle, row selection, export
 
 ### 5. Multi-Step Form
+**Concepts:** Form state architecture, validation, step navigation  
+**Add:** Draft saving (localStorage), navigation guards ("Are you sure?"), progress indicator
 
-#### Features
-- validation
-- draft saving
-- navigation guards
+### 6. Nested Comments System
+**Concepts:** Recursive rendering, reply threading, collapse/expand  
+**Add:** Like/dislike, edit/delete, infinite nesting limit
 
-#### Concepts
-- form architecture
+### 7. Chat Application UI
+**Concepts:** Real-time UI thinking, scroll management, optimistic messages  
+**Add:** Typing indicator, unread count, grouped messages by date
 
+### 8. E-commerce Product Page
+**Concepts:** State architecture, cart management, variant selection  
+**Add:** Image gallery zoom, stock management, add-to-cart animation
 
+### 9. Image Carousel
+**Concepts:** useRef for DOM, touch/swipe, autoplay with cleanup  
+**Add:** Lazy load images, thumbnail preview, keyboard navigation
 
-### 6. Autocomplete Search
+### 10. Video Player (Custom Controls)
+**Concepts:** Media APIs, refs, event handling  
+**Add:** Fullscreen, playback speed, volume, time scrubber, keyboard shortcuts
 
-#### Features
-- debounce
-- API integration
-- caching
+---
 
-#### Concepts
-- async handling
+## 5. Advanced Questions
 
+> Goal: Senior-level — scalable architecture, performance engineering, production thinking.
 
+### 1. Trello Clone
+**Concepts:** Drag-and-drop between lists, optimistic updates, complex state  
+**Add:** Real API integration, undo/redo, card labels/due dates, filters
 
-### 7. Nested Comments System
+### 2. Dynamic Form Builder
+**Concepts:** Schema-driven rendering, dynamic validation, drag-and-drop fields  
+**Add:** JSON export/import, conditional logic (show field B if A = X), preview mode
 
-#### Features
-- replies
-- recursive comments
-- collapse threads
+### 3. Virtualized Data Grid (10k+ rows)
+**Concepts:** Virtualization (react-window), sticky headers, column resize  
+**Add:** Virtual scrolling both axes, cell editing, row grouping
 
-#### Concepts
-- recursive components
+### 4. Real-Time Dashboard
+**Concepts:** WebSocket updates, live charts, efficient re-renders  
+**Add:** Pause/resume updates, historical view, alert thresholds
 
+### 5. Rich Text Editor
+**Concepts:** contenteditable challenges, toolbar state, serialization  
+**Add:** Markdown support, image upload, keyboard shortcuts, export HTML
 
+### 6. Design System / Component Library
+**Concepts:** Scalable component architecture, theming, polymorphic components  
+**Add:** Token-based theming, accessibility first, documentation (Storybook)
 
-### 8. Image Carousel
+### 7. Frontend Architecture Challenge
+**Concepts:** Auth flow, role-based access, routing, caching, feature modules  
+**Add:** Lazy-loaded routes, refresh token handling, permission gates
 
-#### Features
-- autoplay
-- touch swipe
-- lazy loading
+---
 
-#### Concepts
-- gesture handling
+## 6. Common Mistakes
 
+| Mistake | Fix |
+|---------|-----|
+| Start coding immediately | Always spend 5 mins on architecture first |
+| One giant component | Break into small, focused components |
+| No loading/error/empty states | Always handle all 3 async states |
+| `key={index}` in dynamic lists | Always use stable unique IDs |
+| State stored that can be derived | Compute it instead of storing |
+| No cleanup in useEffect | Always clean up subscriptions/timers |
+| Ignoring accessibility | Add semantic HTML + ARIA from the start |
+| Prop drilling 3+ levels | Use Context or lift state appropriately |
+| No performance mention | Always proactively mention memoization/virtualization |
 
+---
 
-### 9. Video Player
+## 7. Preparation Plan
 
-#### Features
-- custom controls
-- fullscreen support
-- playback speed
+**Week 1-2 — Beginner problems**
+Build all 10 beginner problems. Focus on clean component structure and state design.
 
-#### Concepts
-- media APIs
+**Week 3-5 — Intermediate problems**
+Build 6-7 intermediate problems. Focus on async handling, scalable state, accessibility.
 
+**Week 6-8 — Advanced problems**
+Pick 3-4 advanced problems. Focus on production-ready architecture and performance.
 
+**For every problem, always add:**
+- ✅ Loading, error, and empty states
+- ✅ localStorage persistence where it makes sense
+- ✅ Keyboard navigation and accessibility
+- ✅ At least one performance optimization
+- ✅ Clean folder structure
 
-### 10. E-commerce Product Page
+> **Remember:** Interviewers want to see how you think, not just what you build. Talking through decisions out loud is as important as the code itself.
 
-#### Features
-- image gallery
-- variant selection
-- add to cart
+---
 
-#### Concepts
-- state architecture
+## 8. Complete Worked Example — Todo App
 
+> This shows how to think through a "simple" problem the senior way.
 
+**Problem:** Build a Todo app with add, toggle complete, and delete.
 
-## 🔴 Advanced Machine Coding Questions
+---
 
-> Goal: Senior-level frontend engineering thinking.
+### Step 1: Clarify (2 min)
 
+Before coding, ask:
+- Can todos be edited after creation?
+- Should todos persist after page refresh?
+- Any categories or priority levels?
+- Keyboard accessible?
 
+Assume: basic CRUD, localStorage persistence, no categories.
 
-### 1. Google Docs Clone
+---
 
-#### Features
-- collaborative editing
-- autosave
-- cursor sync
-
-#### Concepts
-- realtime systems
-
-
-
-### 2. Trello Clone
-
-#### Features
-- drag & drop
-- optimistic updates
-- board persistence
-
-#### Concepts
-- scalable frontend architecture
-
-
-
-### 3. Dynamic Form Builder
-
-#### Features
-- drag/drop fields
-- dynamic schema
-- validations
-
-#### Concepts
-- dynamic rendering engines
-
-
-
-### 4. IDE / Code Editor
-
-#### Features
-- syntax highlighting
-- tabs
-- minimap
-
-#### Concepts
-- rendering optimization
-
-
-
-### 5. Virtualized Data Grid
-
-#### Features
-- 10k+ rows
-- sticky headers
-- column resize
-
-#### Concepts
-- virtualization
-- performance engineering
-
-
-
-### 6. Whiteboard Application
-
-#### Features
-- drawing
-- zoom/pan
-- undo/redo
-
-#### Concepts
-- canvas APIs
-
-
-
-### 7. Real-Time Dashboard
-
-#### Features
-- websocket updates
-- live charts
-- filters
-
-#### Concepts
-- realtime rendering
-
-
-
-### 8. Design System
-
-#### Features
-- reusable components
-- theming
-- accessibility
-
-#### Concepts
-- scalable component architecture
-
-
-
-### 9. Rich Text Editor
-
-#### Features
-- markdown support
-- formatting
-- image embedding
-
-#### Concepts
-- contenteditable challenges
-
-
-
-### 10. Frontend Architecture Challenge
-
-#### Features
-- authentication
-- permissions
-- routing
-- caching
-- feature modules
-
-#### Concepts
-- enterprise frontend architecture
-
-
-
-## ⚡ Performance Optimization Topics
-
-Interviewers heavily evaluate performance thinking.
-
-
-
-### Important Topics
-
-- memoization
-- virtualization
-- lazy loading
-- code splitting
-- caching
-- debouncing
-- throttling
-- pagination
-- request cancellation
-- image optimization
-- reducing re-renders
-
-
-
-### Common Optimizations
-
-#### Avoid Unnecessary Re-renders
-
-Use:
-- `React.memo`
-- `useMemo`
-- `useCallback`
-
-
-
-#### Optimize Large Lists
-
-Use:
-- virtualization
-- pagination
-- windowing
-
-Libraries:
-- react-window
-- react-virtualized
-
-
-
-#### Optimize Network Calls
-
-Use:
-- debouncing
-- caching
-- request cancellation
-
-
-
-## ♿ Accessibility Checklist
-
-Most candidates ignore this.
-
-Accessibility creates HUGE differentiation.
-
-
-
-### Accessibility Checklist
-
-#### Semantic HTML
-
-Use:
-- button
-- nav
-- main
-- section
-- article
-
-Avoid:
+### Step 2: Component Breakdown (2 min)
 
 ```txt
-div everywhere
+TodoApp
+├── TodoInput       ← controlled input + add button
+├── TodoFilters     ← All / Active / Completed
+├── TodoList
+│   └── TodoItem    ← checkbox + text + delete
+└── TodoStats       ← "3 of 5 completed"
 ```
 
+---
 
+### Step 3: State Design (1 min)
 
-#### Keyboard Navigation
+```js
+// What to store
+const [todos, setTodos] = useState([]);
+const [filter, setFilter] = useState("all"); // "all" | "active" | "completed"
 
-Support:
-- Tab navigation
-- Enter/Space interactions
-- ESC close
-
-
-
-#### ARIA Attributes
-
-Use:
-- aria-label
-- aria-expanded
-- aria-hidden
-
-
-
-#### Focus Management
-
-Important for:
-- modals
-- dropdowns
-- dialogs
-
-
-
-#### Screen Reader Support
-
-Ensure:
-- proper labels
-- accessible forms
-- meaningful content
-
-
-
-## 📁 Folder Structure Best Practices
-
-
-
-### Recommended Structure
-
-```txt
-src/
-├── components/
-├── hooks/
-├── pages/
-├── services/
-├── store/
-├── utils/
-├── constants/
-├── types/
-├── assets/
-└── styles/
+// What NOT to store — derive it
+const filteredTodos = todos.filter(todo => {
+  if (filter === "active") return !todo.completed;
+  if (filter === "completed") return todo.completed;
+  return true;
+});
 ```
 
+Key insight: `filteredTodos` is derived, not stored. Storing it separately creates sync bugs.
 
+---
 
-## 🏛️ Recommended Project Architecture
+### Step 4: Core Implementation
 
+```jsx
+// types
+// { id: string, text: string, completed: boolean }
 
+function TodoApp() {
+  const [todos, setTodos] = useState(() => {
+    // lazy init — reads localStorage only once on mount
+    const saved = localStorage.getItem("todos");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [filter, setFilter] = useState("all");
+  const [input, setInput] = useState("");
 
-### Small Projects
+  // Sync to localStorage on every todos change
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
-```txt
-Feature-based structure
+  const addTodo = () => {
+    if (!input.trim()) return;
+    setTodos(prev => [
+      ...prev,
+      { id: crypto.randomUUID(), text: input.trim(), completed: false },
+    ]);
+    setInput("");
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(prev =>
+      prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(prev => prev.filter(t => t.id !== id));
+  };
+
+  const filteredTodos = todos.filter(t => {
+    if (filter === "active") return !t.completed;
+    if (filter === "completed") return t.completed;
+    return true;
+  });
+
+  return (
+    <div>
+      <TodoInput value={input} onChange={setInput} onAdd={addTodo} />
+      <TodoFilters current={filter} onChange={setFilter} />
+      <TodoList todos={filteredTodos} onToggle={toggleTodo} onDelete={deleteTodo} />
+      <TodoStats total={todos.length} completed={todos.filter(t => t.completed).length} />
+    </div>
+  );
+}
 ```
 
-Example:
+---
 
-```txt
-features/
-├── auth/
-├── dashboard/
-├── users/
-└── settings/
-```
+### Step 5: What to mention to the interviewer
 
+- **No `key={index}`** — using stable IDs from `crypto.randomUUID()`
+- **Lazy `useState` init** — avoids reading localStorage on every render
+- **Immutable updates** — using `.map()` and `.filter()` instead of mutating
+- **Derived state** — `filteredTodos` computed, not stored
+- **Performance:** for 10k+ todos, would add virtualization with react-window
+- **Accessibility:** TodoInput uses `onKeyDown` for Enter key submission, `<button>` for delete has aria-label
 
-
-### Large Projects
-
-Use:
-- modular architecture
-- domain separation
-- reusable shared components
-
-
-
-## ❌ Common Interview Mistakes
-
-
-
-### 1. Starting Coding Immediately
-
-Always discuss:
-- architecture
-- state management
-- edge cases
-
-
-
-### 2. Giant Components
-
-Break UI into reusable modules.
-
-
-
-### 3. Ignoring Performance
-
-Always mention:
-- memoization
-- virtualization
-- optimization ideas
-
-
-
-### 4. Ignoring Accessibility
-
-This is a major differentiator.
-
-
-
-### 5. No Error Handling
-
-Always handle:
-- loading
-- errors
-- empty states
-
-
-
-### 6. Poor Naming
-
-Use meaningful:
-- component names
-- variable names
-- folder names
-
-
-
-## 🎤 Interview Strategy
-
-
-
-## First 5 Minutes
-
-DO NOT CODE.
-
-Discuss:
-- architecture
-- components
-- state structure
-- edge cases
-
-This alone differentiates experienced developers.
-
-
-
-## While Coding
-
-Explain:
-- why this structure?
-- why this hook?
-- why local/global state?
-- why memoization?
-
-
-
-## Before Ending
-
-Always mention:
-- performance improvements
-- accessibility
-- scalability
-- testing strategy
-
-
-
-## 📈 Recommended Preparation Flow
-
-
-
-### Phase 1 — Beginner Problems
-
-#### Goal
-- component thinking
-- UI confidence
-
-#### Duration
-
-```txt
-1 week
-```
-
-
-
-### Phase 2 — Intermediate Problems
-
-#### Goal
-- architecture
-- async handling
-- scalable state
-
-#### Duration
-
-```txt
-3–4 weeks
-```
-
-
-
-### Phase 3 — Advanced Systems
-
-#### Goal
-- production-level thinking
-- optimization
-- scalable frontend systems
-
-#### Duration
-
-```txt
-3–5 weeks
-```
-
-
-
-## 🧪 Recommended Additions While Practicing
-
-For every machine coding problem:
-- add responsiveness
-- add accessibility
-- add loading state
-- add error state
-- optimize rendering
-- add persistence
-- improve folder structure
-
-This creates strong interview differentiation.
-
-
-
-## 🏁 Final Goal
-
-For an experienced frontend developer, interviewers expect:
-
-✅ Strong architecture thinking  
-✅ Clean reusable components  
-✅ Scalable state management  
-✅ Performance optimization  
-✅ Accessibility awareness  
-✅ Production-ready engineering mindset  
-✅ Edge-case handling  
-✅ Maintainable frontend systems  
-
-
-
-## ⭐ Suggested Practice Strategy
-
-Best order:
-
-```txt
-Beginner
-   ↓
-Intermediate
-   ↓
-Advanced
-   ↓
-Performance Optimization
-   ↓
-Frontend Architecture
-```
-
-
-
-## 📌 Final Advice
-
-Machine coding is NOT about:
-
-```txt
-Finishing UI quickly
-```
-
-It is about:
-
-```txt
-Building scalable frontend systems
-```
-
-Think like:
-- product engineer
-- frontend architect
-- performance engineer
-- accessibility-aware developer
-
-That is what differentiates senior frontend developers in interviews.
+This is what separates a 4 YOE answer from a junior answer — not just making it work, but explaining the decisions.

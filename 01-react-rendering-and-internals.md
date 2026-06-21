@@ -1,6 +1,6 @@
 ## React Rendering & Internals
 
-## 📚 Topics Covered
+## Topics Covered
 
 - [1. React Rendering Flow](#1-react-rendering-flow)
 - [2. Virtual DOM](#2-virtual-dom)
@@ -13,1076 +13,227 @@
 - [9. Strict Mode](#9-strict-mode)
 - [10. React Lifecycle Internals](#10-react-lifecycle-internals)
 - [11. Event System](#11-event-system)
+- [12. Error Boundaries](#12-error-boundaries)
+- [13. Portals](#13-portals)
 - [Final Mental Model](#final-mental-model)
+
+---
 
 ## 1. React Rendering Flow
 
-When people start learning React, they often think:
-
-> “State changed → React updates DOM.”
-
-That is technically true, but internally React does much more than that.
-
-The entire React rendering flow exists because directly manipulating the DOM is expensive, hard to scale, and difficult to optimize in large applications.
-
-A simple DOM update is not the real problem.
-
-The real problem is:
-
-- deciding what actually changed
-- updating only the necessary parts
-- preserving component state correctly
-- avoiding UI blocking
-- scheduling updates efficiently
-
-React’s rendering system was designed to solve these problems.
-
-
-
-### The High-Level Flow
-
-A React update generally follows this flow:
+When state changes, React doesn't immediately touch the DOM. It runs through a pipeline designed to figure out the *minimum* changes needed:
 
 ```txt
-State/Props Change
-        ↓
-React schedules update
-        ↓
-Render Phase
-        ↓
-Create new React Elements
-        ↓
-Reconciliation
-        ↓
-Diff old vs new tree
-        ↓
-Prepare DOM mutations
-        ↓
-Commit Phase
-        ↓
-Update Real DOM
-        ↓
-Browser paints screen
+State/Props Change → Schedule update → Render Phase → Reconcile → Commit Phase → Browser paint
 ```
 
-
-
-### What Actually Triggers Rendering?
-
-Rendering happens when:
-
-- `setState` is called
-- props change
-- context changes
-- parent re-renders
-- force update happens
-
-Example:
+**What triggers a render:**
+- `setState` / `useState` updater called
+- Props change
+- Context changes
+- Parent re-renders
 
 ```jsx
 function Counter() {
   const [count, setCount] = useState(0);
-
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      {count}
-    </button>
-  );
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
 }
 ```
 
-When `setCount()` runs:
+When `setCount` runs, React schedules an update — not an immediate DOM change. It creates a new virtual tree, compares it against the old one, and only then decides what needs to change in the DOM.
 
-React does NOT immediately change the DOM.
-
-Instead, React:
-
-1. schedules an update
-2. creates a new virtual tree
-3. compares old vs new
-4. computes changes
-5. commits updates later
-
-
-
-### React Elements Are Just Objects
-
-JSX:
+**JSX is just plain objects.** Under the hood:
 
 ```jsx
 <h1>Hello</h1>
+// becomes:
+{ type: "h1", props: { children: "Hello" } }
 ```
 
-becomes:
+React builds a tree of these lightweight objects and operates on them in memory before touching the browser.
 
-```js
-{
-  type: "h1",
-  props: {
-    children: "Hello"
-  }
-}
-```
+**Re-render ≠ DOM update.** React re-executes the whole component function to produce a new tree, but only *actual differences* lead to DOM mutations. The component may run again while the browser changes nothing.
 
-These lightweight objects form the Virtual DOM tree.
+**Scheduling** — Modern React batches and prioritizes updates instead of processing them immediately. Typing in an input gets higher priority than rendering a large list. This is what keeps the UI responsive.
 
-React rendering is essentially:
-
-```txt
-UI Function → JS Objects → Comparison → DOM Update
-```
-
-
-
-### Render Phase
-
-During rendering:
-
-React executes components again.
-
-Example:
-
-```jsx
-function App() {
-  return <h1>Hello</h1>;
-}
-```
-
-React literally calls:
-
-```js
-App();
-```
-
-This produces new React elements.
-
-Important:
-
-Rendering does NOT mean DOM update.
-
-It only means:
-
-> “Calculate what UI should look like.”
-
-
-
-### Why React Re-renders Entire Components
-
-A common misconception:
-
-> “React updates only changed lines.”
-
-No.
-
-React re-executes the entire component function.
-
-Example:
-
-```jsx
-function User({ name }) {
-  console.log("render");
-
-  return <h1>{name}</h1>;
-}
-```
-
-Changing one prop reruns the whole component function.
-
-Why?
-
-Because React components are pure functions.
-
-React cannot partially execute JavaScript functions safely.
-
-So React reruns the function and compares output.
-
-
-
-### Component Tree Traversal
-
-React renders top-down.
-
-Example:
-
-```jsx
-<App>
-  <Header />
-  <Sidebar />
-  <Content />
-</App>
-```
-
-If `App` re-renders:
-
-React traverses children too.
-
-But DOM updates only happen where differences exist.
-
-This distinction is critical:
-
-| Phase | Meaning |
-|---|---|
-| Re-render | Execute component again |
-| DOM update | Actual browser mutation |
-
-They are NOT the same thing.
-
-
-
-### Scheduling
-
-Modern React does not immediately process every update.
-
-It schedules them.
-
-This allows:
-
-- batching
-- prioritization
-- interruptible rendering
-- concurrent rendering
-
-Example:
-
-Typing in an input gets higher priority than rendering a huge list.
-
-Without scheduling:
-
-UI would freeze.
-
-
-
-### Internal Pipeline
-
-Internally React roughly does:
-
-```txt
-Update Queue
-    ↓
-Scheduler
-    ↓
-Fiber Tree Processing
-    ↓
-Render Phase
-    ↓
-Effect Collection
-    ↓
-Commit Phase
-```
-
-Fiber made this architecture possible.
-
-
-
-### Important Misconception
-
-#### “React updates the DOM efficiently because Virtual DOM is fast.”
-
-Not exactly.
-
-The Virtual DOM itself is not the optimization.
-
-The optimization is:
-
-- batching
-- reconciliation
-- scheduling
-- selective DOM mutation
-- async rendering
-
-The Virtual DOM is mainly a representation layer.
-
-
+---
 
 ## 2. Virtual DOM
 
-The Virtual DOM is one of the most misunderstood parts of React.
+The Virtual DOM is React's in-memory JS representation of the UI — a tree of plain objects describing what should be on screen. It's **not** the reason React is fast.
 
-People often think:
+A naive Virtual DOM implementation can still be slow. React's actual performance comes from:
 
-> “React is fast because of Virtual DOM.”
+- **Efficient reconciliation** — smart tree diffing
+- **Fiber architecture** — interruptible rendering
+- **Batching** — grouping multiple state updates into one render
+- **Scheduling** — priority-based update processing
+- **Minimal DOM mutations** — only changed nodes get touched
 
-That explanation is incomplete.
+The Virtual DOM's real value is **predictability**: React computes the full diff in JS before committing anything to the browser. Expensive DOM operations (which trigger layout and repaint) only happen once, at the very end.
 
-The Virtual DOM is primarily an abstraction layer that helps React reason about UI changes predictably.
-
-
-
-### The Core Problem
-
-Direct DOM manipulation is expensive because:
-
-- DOM operations trigger layout/repaint
-- browser rendering pipeline is slow compared to JS
-- managing large UI trees manually becomes complex
-
-Example without React:
-
-```js
-const div = document.createElement("div");
-div.textContent = "Hello";
-document.body.appendChild(div);
-```
-
-This works.
-
-But scaling this across thousands of dynamic UI updates becomes difficult.
-
-React wanted:
-
-- declarative UI
-- predictable rendering
-- efficient updates
-
-
-
-### What Virtual DOM Actually Is
-
-The Virtual DOM is simply:
-
-> A JavaScript representation of the UI.
-
-Example:
-
-```jsx
-<h1>Hello</h1>
-```
-
-becomes:
-
-```js
-{
-  type: "h1",
-  props: {
-    children: "Hello"
-  }
-}
-```
-
-React builds trees of these objects.
-
-
-
-### Old Tree vs New Tree
-
-When state changes:
-
-React creates a NEW tree.
-
-Then compares:
-
-```txt
-Previous Tree
-vs
-New Tree
-```
-
-This comparison process is reconciliation.
-
-
-
-### Why Use JS Objects?
-
-Because JavaScript operations are cheap.
-
-Comparing objects is faster than blindly mutating the DOM.
-
-React can compute:
-
-```txt
-What changed?
-What stayed same?
-What should update?
-```
-
-before touching the browser.
-
-
-
-### Virtual DOM Is NOT the Real Optimization
-
-This is extremely important.
-
-The Virtual DOM alone is NOT magical.
-
-A naive Virtual DOM implementation can still be slow.
-
-React became fast because of:
-
-- efficient reconciliation
-- Fiber architecture
-- scheduling
-- batching
-- prioritization
-- minimized DOM mutations
-
-
-
-### React Still Updates Real DOM Manually
-
-React eventually performs manual DOM operations like:
-
-```js
-element.textContent = "Updated";
-```
-
-The browser does not understand Virtual DOM.
-
-Only React does.
-
-
-
-### Misconception: “React compares entire DOM trees deeply”
-
-Not exactly.
-
-That would be too slow.
-
-React uses heuristics.
-
-This led to the Diffing Algorithm.
-
-
+---
 
 ## 3. Reconciliation
 
-Reconciliation is the process React uses to determine:
-
-> “What changed between previous UI and next UI?”
-
-Without reconciliation:
-
-React would need to rebuild the entire DOM every update.
-
-That would be extremely inefficient.
-
-
-
-### Example
-
-Old UI:
+Reconciliation is how React answers: *"What changed between the old tree and the new one?"*
 
 ```jsx
-<ul>
-  <li>A</li>
-  <li>B</li>
-</ul>
+// Old                  New
+<ul>                    <ul>
+  <li>A</li>              <li>A</li>
+  <li>B</li>              <li>C</li>
+</ul>                   </ul>
 ```
 
-New UI:
+React walks both trees together — first item unchanged, second item changed. Only the second `<li>` gets updated in the DOM.
+
+**Two core assumptions:**
+
+1. **Different element types → replace the entire subtree.** If `<div>` becomes `<span>`, React doesn't try to patch it. It destroys and recreates.
+
+2. **Keys identify stable children.** Without keys, React matches list items by index. This breaks when items reorder — state shifts to the wrong element.
 
 ```jsx
-<ul>
-  <li>A</li>
-  <li>C</li>
-</ul>
+users.map(user => <User key={user.id} />); // stable identity
 ```
 
-React determines:
+**Why this matters for state:** If React considers a component "the same" across renders, its state survives. If it thinks it's new (different type or key), state resets. A component can lose its form inputs seemingly out of nowhere — keys are almost always the culprit.
 
-```txt
-First item unchanged
-Second item changed
-```
+A mathematically optimal tree diff runs in O(n³), which is too slow for any real UI. React uses heuristics to achieve near-linear performance — which is what the next section (Diffing Algorithm) covers in detail.
 
-Only second node updates.
-
-
-
-### Tree Comparison
-
-React compares trees node-by-node.
-
-Example:
-
-```txt
-App
- ├── Header
- ├── Sidebar
- └── Content
-```
-
-If only `Content` changes:
-
-React avoids touching `Header`.
-
-
-
-### Key Assumptions
-
-React’s reconciliation depends on two assumptions:
-
-#### 1. Different element types produce different trees
-
-```jsx
-<div />
-<span />
-```
-
-React assumes entire subtree changed.
-
-
-
-#### 2. Keys identify stable children
-
-Example:
-
-```jsx
-users.map(user => (
-  <User key={user.id} />
-));
-```
-
-Keys help React preserve identity.
-
-Without stable keys:
-
-- state bugs happen
-- unnecessary remounting occurs
-- performance degrades
-
-
-
-### State Preservation
-
-Reconciliation determines whether component state survives.
-
-Example:
-
-```jsx
-<Input />
-```
-
-If React considers it “same component”:
-
-state preserved.
-
-If React thinks it is new:
-
-state resets.
-
-This is why keys matter deeply.
-
-
-
-### Mount vs Update vs Unmount
-
-Reconciliation decides:
-
-| Operation | Meaning |
-|---|---|
-| Mount | Create new node |
-| Update | Reuse existing node |
-| Unmount | Remove node |
-
-
-
-### Why React Doesn't Use Optimal Tree Diffing
-
-A mathematically optimal tree diff is extremely expensive:
-
-```txt
-O(n³)
-```
-
-Too slow for UI.
-
-React instead uses heuristics for near-linear performance.
-
-
+---
 
 ## 4. Diffing Algorithm
 
-React’s diffing algorithm is the practical implementation of reconciliation.
+React's diffing is the practical implementation of reconciliation using two simple rules.
 
-Its goal:
-
-> Efficiently compare old and new trees.
-
-
-
-### Naive Approach Problem
-
-Imagine comparing every node deeply.
-
-Complexity becomes:
-
-```txt
-O(n³)
-```
-
-Impossible for large apps.
-
-React instead uses heuristic diffing.
-
-
-
-### Rule 1: Different Types = Replace Entire Tree
-
-Example:
+**Rule 1: Different types → destroy and recreate.**
 
 ```jsx
-<div>
-  <Counter />
-</div>
+// <div><Counter /></div>  →  <span><Counter /></span>
+// Counter unmounts and remounts — state is lost
 ```
 
-to:
+Different element types usually mean a completely different UI structure, so React doesn't attempt to reuse anything.
+
+**Rule 2: Same type → reuse the DOM node, update only changed props.**
 
 ```jsx
-<span>
-  <Counter />
-</span>
+<button className="a" />  →  <button className="b" />
+// DOM node reused, only className attribute changes
 ```
 
-React destroys old subtree and creates new one.
+**Child diffing and the key problem:**
 
-Why?
-
-Different element types usually represent different UI structures.
-
-
-
-### Rule 2: Same Type = Reuse Node
-
-Example:
+Without keys, React matches children by position. Inserting at the front shifts every index — React thinks everything changed.
 
 ```jsx
-<button className="a" />
+// Without keys: inserting X before A causes A, B, C to all re-render
+[A, B, C] → [X, A, B, C]
+
+// With stable keys: only X is new, A/B/C are matched correctly
+<Item key={item.id} />
 ```
 
-to:
+**Why `key={index}` causes bugs:** When items reorder, React ties the old state (stored at index 0, 1, 2...) to whatever item now sits at that position. Input values appear to jump between items; animations break; components show stale data.
 
-```jsx
-<button className="b" />
-```
-
-React updates only changed props.
-
-DOM node reused.
-
-
-
-### Child Diffing
-
-Without keys:
-
-React compares by index.
-
-Example:
-
-```jsx
-[A, B, C]
-```
-
-to:
-
-```jsx
-[X, A, B, C]
-```
-
-React thinks everything changed.
-
-Very inefficient.
-
-
-
-### Keys Solve This
-
-With keys:
-
-```jsx
-[
-  {id:1},
-  {id:2}
-]
-```
-
-React can match identities correctly.
-
-
-
-### Why Index Keys Cause Bugs
-
-Example:
-
-```jsx
-key={index}
-```
-
-If list order changes:
-
-React preserves wrong state.
-
-Example:
-
-- input values shift
-- animations break
-- incorrect DOM reuse
-
-
-
-### Performance Impact
-
-Good keys help React:
-
-- reuse components
-- avoid remounting
-- preserve state
-- minimize DOM operations
-
-
+---
 
 ## 5. Render vs Commit Phase
 
-This distinction is fundamental to understanding React internals.
+React splits work into two distinct phases. Conflating them causes most rendering-related bugs.
 
-Most developers think rendering means DOM updates.
-
-It does not.
-
-React splits work into two phases.
-
-
-
-### Render Phase
-
-Purpose:
-
-> Calculate what should change.
-
-React:
-
-- executes components
-- builds new tree
-- compares old vs new
-- prepares effects
-
-No DOM mutations happen here.
-
-This phase must stay pure.
-
-
-
-### Why Purity Matters
-
-React may:
-
-- pause rendering
-- restart rendering
-- discard rendering
-
-Especially in concurrent rendering.
-
-If rendering had side effects:
-
-React would break.
-
-
-
-### Example Problem
-
-Bad:
+**Render Phase** — pure calculation. React calls your component functions, builds a new fiber tree, and diffs it against the old one. No DOM changes happen here. In concurrent mode, React may run this phase multiple times — pausing, restarting, or discarding it entirely. That's why rendering must stay pure:
 
 ```jsx
+// Bad: side effects during render
 function App() {
-  localStorage.setItem("x", "1");
+  localStorage.setItem("x", "1"); // may run multiple times
   return <div />;
 }
 ```
 
-Render now has side effects.
+**Commit Phase** — applying changes to the world. React flushes DOM mutations, runs `useLayoutEffect`, attaches refs, then runs `useEffect` after the browser paints. This phase is **synchronous and uninterruptible** — once it starts, it finishes.
 
-React may execute it multiple times.
-
-
-
-### Commit Phase
-
-Purpose:
-
-> Apply changes to the real world.
-
-Now React:
-
-- updates DOM
-- runs effects
-- attaches refs
-
-Commit phase is synchronous.
-
-Cannot be interrupted.
-
-
-
-### Why Commit Is Separate
-
-Because DOM mutation is expensive and must remain consistent.
-
-React can pause rendering.
-
-But once commit starts:
-
-it must finish.
-
-
-
-### Effects Timing
-
-| Hook | Timing |
+| Hook | When it runs |
 |---|---|
-| useEffect | After paint |
-| useLayoutEffect | Before paint |
+| `useLayoutEffect` | After DOM update, before browser paint |
+| `useEffect` | After browser paint |
 
+Key insight: **concurrent rendering only affects the render phase.** The commit phase always runs to completion.
 
+---
 
 ## 6. Fiber Architecture
 
-Fiber is React’s internal rendering engine introduced in React 16.
+**What is Fiber?** Before React 16, React rendered the entire component tree in one go, synchronously — it couldn't pause in the middle. If you had a large tree, the browser was frozen until React finished. Fiber is the complete rewrite of React's rendering engine that solved this.
 
-Before Fiber:
+Think of Fiber as React's internal task scheduler. Instead of "render everything now", Fiber breaks rendering into small units of work and processes them one by one — pausing between units if the browser needs to handle something more urgent (like a user keystroke).
 
-React rendering was synchronous.
+Fiber represents each component as a node in a **linked list**. Each node stores component type, props, state, parent/child/sibling pointers, pending effects, and priority. This structure lets React process work in small units and pause at any point to yield control back to the browser.
 
-Problem:
+**Double buffering:** React maintains two trees simultaneously — the *current* tree (what's on screen) and the *work-in-progress* tree (the update being built). After commit, they swap. This means React can abandon an in-progress update without corrupting the live UI.
 
-Large renders blocked the main thread.
+Fiber is what made Suspense, transitions, and concurrent rendering possible.
 
-UI froze.
-
-
-
-### The Core Idea
-
-Fiber breaks rendering work into small units.
-
-Instead of:
-
-```txt
-Render everything now
-```
-
-React can now:
-
-```txt
-Pause
-Resume
-Prioritize
-Abort
-Reuse
-```
-
-
-
-### Fiber Node
-
-Each component gets a Fiber node.
-
-Fiber stores:
-
-- component type
-- props
-- state
-- parent/child/sibling links
-- effects
-- priority
-
-Fiber is basically:
-
-> React’s internal linked-list tree structure.
-
-
-
-### Double Buffering
-
-React maintains:
-
-| Tree | Purpose |
-|---|---|
-| Current Tree | Visible UI |
-| Work-In-Progress Tree | New updates |
-
-After commit:
-
-trees swap.
-
-
-
-### Why Fiber Was Revolutionary
-
-Fiber enabled:
-
-- concurrent rendering
-- Suspense
-- transitions
-- interruptible rendering
-- scheduling priorities
-
-Modern React depends heavily on Fiber.
-
-
+---
 
 ## 7. Concurrent Rendering
 
-Concurrent rendering allows React to prepare UI in the background without blocking the browser.
+**Why does this exist?** JavaScript runs on a single thread — meaning React and your UI (scrolling, typing, animations) share the same thread. Before React 18, if React was in the middle of a big render, everything else had to wait. Your keystrokes would lag. Concurrent rendering fixes this.
 
-This does NOT mean multithreading.
+Concurrent rendering lets React prepare updates in the background without blocking the browser. "Concurrent" here does NOT mean parallel threads — JavaScript is still single-threaded. It means React can *yield* between units of work, letting the browser handle urgent tasks (like input), then resume rendering.
 
-JavaScript still runs on one thread.
-
-
-
-### The Problem
-
-Without concurrency:
-
-Large rendering tasks freeze UI.
-
-Example:
-
-- typing lags
-- scrolling stutters
-
-
-
-### Concurrent Solution
-
-React can:
-
-- pause rendering
-- yield to browser
-- continue later
-
-This improves responsiveness.
-
-
-
-### Priority-Based Rendering
-
-React assigns priorities.
-
-Example:
+Without concurrency, a heavy render (large list, complex tree) blocks the main thread. Typing lags. Scrolling stutters. With concurrency, React pauses low-priority renders to handle high-priority input events, then resumes.
 
 | Task | Priority |
 |---|---|
-| Typing | High |
-| Animation | High |
-| Huge list render | Lower |
+| User input | High |
+| Animations | High |
+| Background list render | Lower |
 
-
-
-### Interruptible Rendering
-
-React may start rendering:
-
-```txt
-BigComponent
-```
-
-Then pause for:
-
-```txt
-Input update
-```
-
-Then resume later.
-
-
-
-### Important Detail
-
-Concurrent rendering affects:
-
-Render Phase only.
-
-Commit phase stays synchronous.
-
-
-
-### Transitions
-
-Example:
+`startTransition` marks an update as non-urgent:
 
 ```jsx
 startTransition(() => {
-  setSearchQuery(value);
+  setSearchQuery(value); // React can defer this
 });
 ```
 
-Marks update as non-urgent.
+This keeps typing instant even while filtering a large list. The search still runs — just not at the cost of input responsiveness.
 
-Typing remains responsive.
-
-
+---
 
 ## 8. Batching
 
-Batching means:
-
-> Multiple state updates combine into one render.
-
-
-
-### Example
+Batching groups multiple state updates into a single render.
 
 ```jsx
 setCount(c => c + 1);
 setFlag(true);
+// → one render, not two
 ```
 
-React batches them.
+Before React 18, batching only worked inside React event handlers. Updates inside `setTimeout`, Promises, or async functions each triggered their own render. **React 18 introduced automatic batching everywhere.**
 
-Only one render occurs.
+To opt out when you explicitly need two separate renders:
 
+```jsx
+import { flushSync } from 'react-dom';
+flushSync(() => setCount(c => c + 1)); // forces immediate render
+```
 
-
-### Why Batching Exists
-
-Without batching:
-
-Every state update would trigger rendering.
-
-Very inefficient.
-
-
-
-### Automatic Batching
-
-React 18 expanded batching to:
-
-- promises
-- timeouts
-- async callbacks
-
-Before React 18:
-
-only React event handlers were batched.
-
-
-
-### Internal Benefit
-
-Batching reduces:
-
-- render count
-- reconciliation work
-- DOM mutations
-
-Huge performance improvement.
-
-
+---
 
 ## 9. Strict Mode
 
-Strict Mode is a development-only tool.
+`<React.StrictMode>` is a development-only tool — it does nothing in production.
 
-It intentionally makes React more aggressive to detect unsafe patterns.
+In development, React deliberately double-invokes render functions and effects to surface two classes of bugs:
 
-
-
-### Why Components Render Twice
-
-Example:
+1. **Impure renders** — side effects during rendering fire twice, making the problem visible
+2. **Effect cleanup bugs** — effects mount, unmount, and remount; missing cleanup causes errors or leaks
 
 ```jsx
 <React.StrictMode>
@@ -1090,217 +241,169 @@ Example:
 </React.StrictMode>
 ```
 
-React may double invoke rendering.
+The double-invocation mirrors how concurrent rendering can pause and restart renders. If code breaks in Strict Mode, it would break in concurrent mode too.
 
-Purpose:
-
-Detect impure logic.
-
-
-
-### What Strict Mode Detects
-
-- side effects during render
-- unsafe lifecycles
-- deprecated APIs
-- effect cleanup bugs
-
-
-
-### Important Misconception
-
-Strict Mode does NOT affect production.
-
-Only development behavior changes.
-
-
-
-### Why Effects Re-run
-
-React intentionally mounts/unmounts effects to verify cleanup correctness.
-
-This helps detect memory leaks.
-
-
+---
 
 ## 10. React Lifecycle Internals
 
-Class components had explicit lifecycle methods:
+Hooks don't have named lifecycle methods, but React still follows the same three phases internally.
 
-```txt
-Mount
-Update
-Unmount
-```
+| Phase | Trigger | What happens |
+|---|---|---|
+| Mount | First render | Fiber created, component runs, DOM built, effects fire |
+| Update | State/props/context change | Component reruns, tree reconciled, DOM patched, effects run |
+| Unmount | Component removed | Effects cleaned up, refs detached, DOM removed |
 
-Modern React internally still follows similar phases.
+**Class lifecycle → hooks mapping:**
 
-
-
-### Mount Phase
-
-Component created first time.
-
-Internally React:
-
-- creates Fiber
-- executes component
-- creates DOM nodes
-- commits UI
-
-
-
-### Update Phase
-
-Triggered by:
-
-- state changes
-- props changes
-- context changes
-
-React:
-
-- rerenders component
-- reconciles tree
-- commits updates
-
-
-
-### Unmount Phase
-
-Component removed.
-
-React:
-
-- removes effects
-- detaches refs
-- removes DOM nodes
-
-
-
-### Hooks Mapping
-
-| Class Lifecycle | Hooks Equivalent |
+| Class | Hooks equivalent |
 |---|---|
-| componentDidMount | useEffect |
-| componentDidUpdate | useEffect |
-| componentWillUnmount | cleanup |
+| `componentDidMount` | `useEffect(() => {}, [])` |
+| `componentDidUpdate` | `useEffect(() => {}, [dep])` |
+| `componentWillUnmount` | `useEffect(() => { return cleanup }, [])` |
 
+**Why hooks can't be conditional:** React stores hook state as a linked list on each fiber node. The order of calls must be identical every render so React can match each hook call to its stored state. A conditional hook breaks the index alignment, corrupting state for every hook that follows it.
 
-
-### Important Internal Detail
-
-Hooks are stored internally as linked lists on Fiber nodes.
-
-Order matters.
-
-That is why hooks cannot be conditional.
-
-
+---
 
 ## 11. Event System
 
-React does not attach event listeners directly to every element.
-
-Instead, it uses an event delegation system.
-
-
-
-### The Problem
-
-Attaching listeners everywhere is expensive.
-
-Example:
+React doesn't attach event listeners to individual elements. It attaches a small set of listeners at the **root** and uses event delegation — native browser events bubble up, React intercepts them centrally.
 
 ```txt
-10,000 buttons
-= 10,000 listeners
+10,000 buttons → 1 root listener (not 10,000)
 ```
 
-Not scalable.
+React wraps native events in **SyntheticEvents** — normalized objects with a consistent API across browsers. For most code, you'll never notice the difference.
 
+**Event pooling** was an older optimization where React reused event objects between handlers. It caused confusing bugs in async code (`event.target` would be null after an `await`). It was removed in React 17.
 
+**Events and scheduling:** React integrates event handling with the Fiber scheduler, assigning priorities. A click event can preempt a background render. This is how concurrent rendering stays responsive without you writing any explicit throttling code.
 
-### Event Delegation
+---
 
-React attaches a small number of listeners at the root.
+## 12. Error Boundaries
 
-Events bubble upward.
+Error boundaries are React components that catch JavaScript errors in their child component tree, log them, and display a fallback UI instead of crashing the entire app.
 
-React intercepts them.
-
-
-
-### Synthetic Events
-
-React wraps native browser events inside Synthetic Events.
-
-Example:
+**Class component implementation** (hooks don't support error boundaries yet):
 
 ```jsx
-<button onClick={handleClick} />
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    logErrorToService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
 ```
 
-React creates normalized event objects.
+**Usage:**
 
-Benefits:
-
-- cross-browser consistency
-- unified API
-- controlled propagation
-
-
-
-### Event Pooling (Old React)
-
-Older React reused event objects for performance.
-
-This caused issues:
-
-```js
-console.log(event.target);
+```jsx
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
 ```
 
-inside async callbacks failed.
+**What error boundaries catch:**
+- Errors during rendering
+- Errors in lifecycle methods
+- Errors in constructors of child components
 
-React later removed pooling.
+**What they DON'T catch:**
+- Event handlers (use try/catch instead)
+- Asynchronous code (setTimeout, promises)
+- Server-side rendering errors
+- Errors in the error boundary itself
 
+**Why they matter:** Without error boundaries, a single error in a small component crashes your entire React tree. Error boundaries contain the damage — the rest of the app keeps working.
 
+**Interview tip:** For 4 YOE, you're expected to know error boundaries exist and when to use them. Production apps should have error boundaries at strategic points (route level, feature boundaries).
 
-### Event Priority
+**Production reality:** Writing the class manually every time is tedious. The `react-error-boundary` npm package is the standard way to add error boundaries in real apps — it gives you a functional, reusable `<ErrorBoundary>` component with reset support, so you almost never write the class yourself.
 
-Modern React integrates events with scheduler priorities.
+```jsx
+import { ErrorBoundary } from "react-error-boundary";
 
-Example:
+<ErrorBoundary fallback={<ErrorPage />}>
+  <FeatureSection />
+</ErrorBoundary>
+```
 
-| Event | Priority |
-|---|---|
-| Click | High |
-| Scroll | High |
-| Transition | Lower |
+---
 
-This helps concurrent rendering stay responsive.
+## 13. Portals
 
+Portals let you render children into a DOM node that exists outside the parent component's DOM hierarchy.
 
+**Use case:** Modals, tooltips, dropdowns — UI that needs to break out of `overflow: hidden` or `z-index` stacking contexts.
+
+```jsx
+ReactDOM.createPortal(child, domNode)
+```
+
+**Example:**
+
+```jsx
+function Modal({ children }) {
+  return ReactDOM.createPortal(
+    <div className="modal">
+      {children}
+    </div>,
+    document.getElementById('modal-root')
+  );
+}
+```
+
+**HTML structure:**
+
+```html
+<body>
+  <div id="root"><!-- React app --></div>
+  <div id="modal-root"><!-- Portals render here --></div>
+</body>
+```
+
+**Key behavior:** Even though the modal renders in a different DOM tree, it still behaves like a normal React child:
+- Events bubble up through React tree (not DOM tree)
+- Context works normally
+- State flows down as expected
+
+**Why use portals:**
+- Escape CSS constraints (overflow, z-index)
+- Render at document root for accessibility
+- Keep React tree structure clean
+
+**Interview insight:** Know the difference between DOM hierarchy and React component hierarchy. Portals break DOM hierarchy while preserving React tree.
+
+---
 
 ## Final Mental Model
 
-React is fundamentally:
-
 ```txt
-UI = Function(State)
+UI = f(state)
 ```
 
-But internally React is also:
+But React internally is:
 
 ```txt
-Scheduler
-+ Fiber Architecture
-+ Reconciliation Engine
-+ Priority System
-+ DOM Renderer
+Scheduler + Fiber + Reconciler + Priority Queue + DOM Renderer
 ```
 
-Modern React is less about “Virtual DOM library” and more about:
-
-> A highly optimized UI scheduling and rendering engine.
+The "Virtual DOM library" framing misses the point. React is an **optimized rendering scheduler** — the Virtual DOM is just how it represents pending work before executing it.

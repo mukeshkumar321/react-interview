@@ -1,1277 +1,418 @@
-## 🪝 React Hooks Deep Dive
+## React Hooks Deep Dive
 
-## 📚 Topics Covered
+## Topics Covered
 
 - [1. Why Hooks Exist](#1-why-hooks-exist)
 - [2. Rules of Hooks](#2-rules-of-hooks)
-- [3. useState Internals](#3-usestate-internals)
-- [4. React Rendering & State Updates](#4-react-rendering--state-updates)
-- [5. useEffect Deep Dive](#5-useeffect-deep-dive)
-- [6. Effect Lifecycle & Cleanup](#6-effect-lifecycle--cleanup)
-- [7. Dependency Array Internals](#7-dependency-array-internals)
-- [8. Stale Closures](#8-stale-closures)
-- [9. useRef Internals](#9-useref-internals)
-- [10. useMemo Deep Dive](#10-usememo-deep-dive)
-- [11. useCallback Deep Dive](#11-usecallback-deep-dive)
-- [12. React.memo & Memoization Strategy](#12-reactmemo--memoization-strategy)
-- [13. Context API + useContext Internals](#13-context-api--usecontext-internals)
-- [14. Custom Hooks Architecture](#14-custom-hooks-architecture)
-- [15. useReducer Deep Dive](#15-usereducer-deep-dive)
-- [16. Hook Execution Order](#16-hook-execution-order)
-- [17. Hook Storage Internals (Fiber + Linked List)](#17-hook-storage-internals-fiber--linked-list)
-- [18. Batching with Hooks](#18-batching-with-hooks)
-- [19. Concurrent Rendering + Hooks](#19-concurrent-rendering--hooks)
-- [20. Strict Mode & Hooks Behavior](#20-strict-mode--hooks-behavior)
-- [21. Advanced Hooks](#21-advanced-hooks)
-- [22. Hook Performance Optimization](#22-hook-performance-optimization)
-- [23. Common Hooks Pitfalls](#23-common-hooks-pitfalls)
-- [24. Senior-Level Hooks Patterns](#24-senior-level-hooks-patterns)
-- [Final Mental Model](#final-mental-model)
+- [3. useState Deep Dive](#3-usestate-deep-dive)
+- [4. useEffect Deep Dive](#4-useeffect-deep-dive)
+- [5. Effect Cleanup & Dependencies](#5-effect-cleanup--dependencies)
+- [6. Stale Closures](#6-stale-closures)
+- [7. useRef](#7-useref)
+- [8. useMemo](#8-usememo)
+- [9. useCallback](#9-usecallback)
+- [10. useContext](#10-usecontext)
+- [11. Custom Hooks](#11-custom-hooks)
+- [12. Common Pitfalls](#12-common-pitfalls)
 
-
+---
 
 ## 1. Why Hooks Exist
 
-Before Hooks, React components were mainly divided into:
+**Interview Focus:** Extremely common question - "Why did React introduce Hooks?"
 
-- Class Components → state + lifecycle
-- Function Components → UI only
+Before Hooks, React had a hard split: class components handled state and lifecycle, while function components were just for rendering UI. Classes brought problems: `this` binding confusion, logic scattered across lifecycle methods, no good way to reuse stateful logic without HOCs or render props, and large components that became impossible to refactor.
 
-Example:
-
-```jsx
-class User extends React.Component {
-  state = { count: 0 };
-
-  componentDidMount() {
-    console.log("Mounted");
-  }
-
-  render() {
-    return <button>{this.state.count}</button>;
-  }
-}
-```
-
-Problems with classes:
-
-- `this` confusion
-- lifecycle duplication
-- logic scattered across methods
-- hard to reuse stateful logic
-- large components became messy
-- HOCs/render props caused wrapper hell
-
-Hooks solved this by allowing:
-
-- state in functions
-- lifecycle behavior in functions
-- reusable stateful logic
-- better composition
-- simpler mental model
-
-Now logic can be grouped by feature instead of lifecycle phase.
-
-Bad class organization:
+Hooks solved all of this by letting function components have state, effects, and context while grouping logic by feature instead of lifecycle phase.
 
 ```jsx
-componentDidMount() {
-  fetchUser();
-}
+// Before: duplicated logic across lifecycle methods
+componentDidMount() { fetchUser(); }
+componentDidUpdate() { fetchUser(); }
 
-componentDidUpdate() {
-  fetchUser();
-}
+// After: grouped by what it does
+useEffect(() => { fetchUser(); }, []);
 ```
 
-Hooks:
+**What hooks fundamentally are:** A way for React to attach persistent stateful memory to function components. Normally functions lose all variables after execution. Hooks give React-controlled persistent storage that survives across renders.
 
-```jsx
-useEffect(() => {
-  fetchUser();
-}, []);
-```
-
-Hooks are fundamentally:
-
-> A way for React Fiber to attach persistent stateful memory to function components.
-
-Functions normally lose variables after execution.
-
-Hooks give React-controlled persistent storage between renders.
-
-
+---
 
 ## 2. Rules of Hooks
 
-Hooks must follow strict ordering rules.
+**Interview Focus:** Critical understanding - often asked in both behavioral and practical questions.
 
-### Rule 1 — Only Call Hooks at Top Level
+Hooks must follow strict ordering rules because React tracks them by call sequence, not by name.
 
-❌ Wrong:
-
-```jsx
-if (show) {
-  useEffect(() => {});
-}
-```
-
-✅ Correct:
+**Rule 1: Only call hooks at the top level** - never inside conditions, loops, or nested functions.
 
 ```jsx
-useEffect(() => {
-  if (show) {
-    // logic
-  }
-}, [show]);
+// Bad
+if (show) { useEffect(() => {}); }
+
+// Good
+useEffect(() => { if (show) { /* logic */ } }, [show]);
 ```
 
-Why?
+React stores hooks as a linked list. Each render, it walks the list in order. If a hook disappears conditionally, the positions shift and React attaches the wrong state to the wrong hook.
 
-React tracks hooks by call order.
+**Rule 2: Only call hooks in React functions** - function components or custom hooks only. React needs the render context to connect hooks to the Fiber tree.
 
-Example:
+---
 
-```jsx
-useState(); // Hook 1
-useEffect(); // Hook 2
-useMemo(); // Hook 3
-```
+## 3. useState Deep Dive
 
-If one hook disappears conditionally:
-
-```jsx
-if (x) useEffect();
-```
-
-Then hook positions shift.
-
-React would attach wrong state to wrong hooks.
-
-
-
-### Rule 2 — Only Call Hooks in React Functions
-
-Allowed:
-
-- function components
-- custom hooks
-
-Not allowed:
-
-- regular utility functions
-- loops
-- event handlers
-- class components
-
-Reason:
-
-React needs render context to connect hooks with Fiber.
-
-
-
-## 3. useState Internals
-
-`useState` looks simple:
+**Interview Focus:** Understanding functional updates and batching is commonly tested.
 
 ```jsx
 const [count, setCount] = useState(0);
 ```
 
-Internally React creates:
+React creates a hook object with a state snapshot and an update queue. State updates are queued, not immediate. When you call `setCount(count + 1)`, React schedules a re-render.
 
-- hook object
-- update queue
-- state snapshot
-
-Simplified structure:
-
-```js
-Hook = {
-  memoizedState: 0,
-  queue: [],
-  next: Hook
-}
-```
-
-React stores hooks inside Fiber nodes.
-
-Every render walks the hook linked list in order.
-
-
-
-### State Updates Are Queued
+**Functional updates** solve the stale value problem:
 
 ```jsx
-setCount(count + 1);
-```
-
-does NOT immediately mutate state.
-
-React creates an update object:
-
-```js
-Update = {
-  action: count + 1
-}
-```
-
-Then schedules re-render.
-
-
-
-### Functional Updates
-
-Problem:
-
-```jsx
+// Both use the same stale value - doesn't work as expected
 setCount(count + 1);
 setCount(count + 1);
-```
 
-Both use same stale value.
-
-Solution:
-
-```jsx
+// React applies these sequentially, so they compound
 setCount(c => c + 1);
 setCount(c => c + 1);
 ```
 
-React applies updates sequentially.
+**Why immutability matters:** React's reconciliation depends on reference comparison (`oldObj !== newObj`). If you mutate an object instead of creating a new one, React can't detect the change.
 
+> For how React's rendering and batching work, see File 01: React Rendering & Internals.
 
+---
 
-### Why State Is Immutable
+## 4. useEffect Deep Dive
 
-React depends on reference comparison.
+**Interview Focus:** Most misunderstood hook - frequently tested in practical scenarios.
 
-```js
-oldObj !== newObj
-```
-
-Mutation breaks change detection.
-
-
-
-## 4. React Rendering & State Updates
-
-When state changes:
-
-```jsx
-setCount(5);
-```
-
-React does NOT immediately update DOM.
-
-Pipeline:
-
-1. enqueue update
-2. schedule render
-3. build new Fiber tree
-4. compare old/new trees
-5. commit changes
-
-Rendering is pure calculation.
-
-DOM updates happen later.
-
-
-
-### Render Phase
-
-React executes component functions again.
-
-```jsx
-function App() {
-  const [count] = useState(0);
-
-  return <div>{count}</div>;
-}
-```
-
-This entire function reruns.
-
-
-
-### Commit Phase
-
-Only actual DOM mutations occur here.
-
-Example:
-
-```jsx
-<div>1</div>
-→
-<div>2</div>
-```
-
-React manually updates text node.
-
-
-
-## 5. useEffect Deep Dive
-
-`useEffect` synchronizes React with external systems.
-
-Examples:
-
-- API calls
-- subscriptions
-- timers
-- DOM listeners
-
-Not for deriving UI state.
-
-
-
-### Mental Model
-
-Effects run AFTER commit.
+`useEffect` is for synchronizing React with external systems: API calls, subscriptions, timers, DOM event listeners. It's NOT for deriving UI state from other state.
 
 ```jsx
 useEffect(() => {
-  console.log("DOM updated");
+  console.log("DOM is updated");
 });
 ```
 
-React guarantees DOM exists first.
+Effects run after commit - React guarantees the DOM exists and the browser has painted before your effect fires. This keeps rendering pure.
 
+**Why effects exist:** React rendering must stay side-effect-free. If you mutate `localStorage` during render, React may run that code multiple times, causing bugs. Effects separate side effects from rendering.
 
+**Timing sequence:**
+1. Render phase (pure)
+2. Commit phase (DOM mutations)
+3. Browser paint
+4. Effects run (`useEffect`)
 
-### Why Effects Exist
+`useLayoutEffect` runs synchronously before paint, blocking the browser - only use it when you need to measure or mutate the DOM before the user sees it.
 
-React rendering must stay pure.
+---
 
-Bad:
+## 5. Effect Cleanup & Dependencies
 
-```jsx
-function App() {
-  localStorage.setItem("x", 1);
-}
-```
-
-Render should not cause side effects.
-
-Effects separate side effects from rendering.
-
-
-
-### Timing
-
-Sequence:
-
-1. render phase
-2. commit phase
-3. browser paint
-4. passive effects run
-
-
-
-## 6. Effect Lifecycle & Cleanup
-
-Effects have lifecycle behavior.
+**Interview Focus:** Understanding cleanup is essential - often tested with real-world scenarios like subscriptions.
 
 ```jsx
 useEffect(() => {
   const id = setInterval(() => {}, 1000);
-
-  return () => clearInterval(id);
+  return () => clearInterval(id); // cleanup
 }, []);
 ```
 
-Cleanup prevents leaks.
+**Effect Lifecycle:**
+- Mount: effect runs
+- Dependency change: cleanup runs, then new effect runs
+- Unmount: cleanup runs one last time
 
+Cleanup prevents duplicate subscriptions, memory leaks, and stale timers.
 
+**Dependency Array:**
 
-### Actual Lifecycle
-
-Mount:
-
-```txt
-effect runs
-```
-
-Dependency change:
-
-```txt
-cleanup old effect
-run new effect
-```
-
-Unmount:
-
-```txt
-cleanup runs
-```
-
-
-
-### Why Cleanup Happens Before New Effect
-
-Prevents duplicate subscriptions.
-
-Without cleanup:
-
-- duplicate listeners
-- memory leaks
-- stale intervals
-
-
-
-## 7. Dependency Array Internals
+React compares dependencies using `Object.is()` (shallow equality). If any dependency changed, the effect reruns.
 
 ```jsx
-useEffect(() => {}, [count]);
+useEffect(() => {}, [count]); // reruns when count changes
 ```
 
-React stores previous dependencies.
+**Critical mindset:** The dependency array is not "when should this effect run?" It's "what values does this effect depend on?" If your effect uses `count`, it depends on `count` - period. Leaving it out creates stale closure bugs.
 
-Internally:
+---
+
+## 6. Stale Closures
+
+**Interview Focus:** One of the most important hook concepts - frequently appears in senior interviews.
+
+**First: what is a closure?** In JavaScript, when a function is created, it "closes over" the variables that existed at the time it was created. It captures a snapshot of those variables — not a live reference. Even if those variables change later, the function still holds the old version.
 
 ```js
-prevDeps = [1]
-nextDeps = [2]
+function makeCounter() {
+  let count = 0;
+  return function() {
+    console.log(count); // captures count from outer scope
+  };
+}
 ```
 
-Comparison uses:
-
-```js
-Object.is()
-```
-
-NOT deep equality.
-
-
-
-### Why Objects Cause Re-renders
-
-```jsx
-useEffect(() => {}, [{}]);
-```
-
-Every render creates new object reference.
-
-Thus effect reruns.
-
-
-
-### Misconception
-
-Dependency array is NOT:
-
-> “When should effect run?”
-
-It is:
-
-> “What values does this effect depend on?”
-
-Huge difference.
-
-
-
-## 8. Stale Closures
-
-One of the most important Hooks concepts.
-
-Example:
+In React, every render creates a new scope with new variable values. Functions created inside that render (like effect callbacks) capture those values at that moment.
 
 ```jsx
 useEffect(() => {
   setInterval(() => {
-    console.log(count);
+    console.log(count); // always logs 0
   }, 1000);
 }, []);
 ```
 
-Why stale?
+Why? The effect runs once on mount and captures the `count` from that render (0). The interval keeps running with that captured value forever.
 
-Effect captures initial render snapshot.
+**Every render creates a new scope:**
 
-Closures preserve old variables.
-
-
-
-### React Render Snapshots
-
-Every render creates new scope.
-
-```txt
+```
 Render 1 → count = 0
 Render 2 → count = 1
 Render 3 → count = 2
 ```
 
-Effects belong to specific render snapshots.
+Effects belong to specific render snapshots. Closures preserve the variables from that snapshot.
 
+**Solutions:**
 
+1. Add the dependency - effect will re-create the interval with the fresh value
+2. Use functional updates - no need to reference `count`: `setCount(c => c + 1)`
+3. Use refs - mutable container that doesn't trigger re-renders: `ref.current = count`
 
-### Solutions
+---
 
-#### Add dependency
+## 7. useRef
 
-```jsx
-useEffect(() => {}, [count]);
-```
+**Interview Focus:** Understanding refs vs state is commonly tested.
 
-#### Use functional updates
-
-```jsx
-setCount(c => c + 1);
-```
-
-#### Use refs
+`useRef` creates a mutable container that persists across renders:
 
 ```jsx
-ref.current
+const ref = useRef(initialValue);
+// Internally: { current: initialValue }
 ```
 
+React preserves the same object between renders. Mutating `ref.current` does NOT trigger a re-render.
 
+**Use cases:**
+- DOM access: `<input ref={inputRef} />`
+- Storing previous values
+- Mutable timers or IDs
+- Avoiding stale closures (store the latest value in a ref)
 
-## 9. useRef Internals
-
-`useRef` creates persistent mutable container.
+**forwardRef pattern** - for passing refs through components:
 
 ```jsx
-const ref = useRef();
+const Input = forwardRef((props, ref) => {
+  return <input ref={ref} {...props} />;
+});
 ```
 
-Internally:
+---
 
-```js
-{
-  current: value
-}
-```
+## 8. useMemo
 
-React preserves same object between renders.
+**Interview Focus:** Understanding when to use memoization is a common senior-level question.
 
-
-
-### Important Difference
-
-Changing ref does NOT trigger render.
+`useMemo` caches a computed value:
 
 ```jsx
-ref.current = 10;
+const value = useMemo(() => expensiveCalculation(x), [x]);
 ```
 
-Why?
+React stores the result and dependencies. If dependencies haven't changed, React returns the cached value instead of re-computing.
 
-React does not track refs for reconciliation.
+**Important:** `useMemo` is a performance hint, not a semantic guarantee. React may discard the cache at any time. Don't rely on it for correctness - only for performance.
 
-Refs are escape hatches from rendering system.
+**When to use:**
+- Actually expensive calculations
+- Stable references to prevent child re-renders
+- Values passed as dependencies to effects or other memoized hooks
 
+**Don't overuse:** Memoization has a cost (memory, comparison overhead). Only use it when needed.
 
+---
 
-### Common Uses
+## 9. useCallback
 
-- DOM access
-- previous values
-- mutable timers
-- avoiding stale closures
+**Interview Focus:** Often asked alongside React.memo - understanding reference equality is key.
 
-
-
-## 10. useMemo Deep Dive
-
-`useMemo` memoizes computed values.
+`useCallback` is `useMemo` for functions:
 
 ```jsx
-const value = useMemo(() => expensive(), [x]);
+const fn = useCallback(() => {}, [dep]);
+// Equivalent to: useMemo(() => fn, [dep])
 ```
 
-React stores:
+Functions are recreated every render, which means new references. If you pass a new function reference to a memoized child, it rerenders even though the function body is identical. `useCallback` returns the same reference when dependencies haven't changed.
 
-```js
-{
-  value,
-  deps
-}
-```
+**Misconception:** `useCallback` doesn't prevent the function from being created - it's still defined every render. React just returns the previous cached reference instead of the new one.
 
-If deps unchanged:
+Useful with `React.memo`, in dependency arrays, or when passing callbacks to expensive child components.
 
-```txt
-skip recomputation
-```
+---
 
+## 10. useContext
 
+**Interview Focus:** Understanding Context performance issues is commonly tested.
 
-### Important Reality
-
-`useMemo` is performance optimization ONLY.
-
-Not semantic guarantee.
-
-React may discard cache.
-
-
-
-### Bad Usage
+`useContext` lets you read context values without prop drilling:
 
 ```jsx
-const arr = useMemo(() => [1,2,3], []);
+const theme = useContext(ThemeContext);
 ```
 
-Unnecessary optimization.
+When the context Provider's value changes, all components using `useContext` re-render.
 
-Memoization itself has cost.
-
-
-
-### Good Usage
-
-- expensive calculations
-- stable references
-- preventing child rerenders
-
-
-
-## 11. useCallback Deep Dive
-
-`useCallback` memoizes functions.
+**Common trap:**
 
 ```jsx
-const fn = useCallback(() => {}, []);
+<Provider value={{ theme, user }} /> // new object every render
 ```
 
-Equivalent to:
+This triggers all consumers to re-render. Fix with `useMemo`:
 
 ```jsx
-useMemo(() => fn, deps)
+const value = useMemo(() => ({ theme, user }), [theme, user]);
 ```
 
+**Best practices:**
+- Split contexts - instead of one giant context, use separate contexts for theme, auth, settings
+- Memoize context values to prevent unnecessary re-renders
 
+> For deep dive on Context API and advanced patterns, see File 04: State Management.
 
-### Why Functions Matter
+---
 
-Functions are recreated every render.
+## 11. Custom Hooks
 
-```jsx
-() => {}
-!== 
-() => {}
-```
+**Interview Focus:** Building custom hooks is a common practical interview question.
 
-New references can trigger child rerenders.
-
-
-
-### Useful With
-
-- `React.memo`
-- dependency arrays
-- event optimization
-
-
-
-### Misconception
-
-`useCallback` does NOT prevent function creation.
-
-Function still created.
-
-React simply reuses previous cached reference.
-
-
-
-## 12. React.memo & Memoization Strategy
-
-`React.memo` skips rerender if props unchanged.
-
-```jsx
-export default React.memo(Button);
-```
-
-Comparison uses shallow equality.
-
-
-
-### Why This Matters
-
-Parent rerender normally rerenders children.
-
-Memoization can isolate expensive trees.
-
-
-
-### Common Failure
-
-```jsx
-<Button onClick={() => {}} />
-```
-
-New function every render.
-
-Memo fails.
-
-
-
-### Real Optimization Strategy
-
-Optimization should follow:
-
-1. avoid unnecessary state
-2. colocate state
-3. reduce rerenders
-4. memoize expensive components
-
-Memoization everywhere is harmful.
-
-
-
-## 13. Context API + useContext Internals
-
-Context solves prop drilling.
-
-```jsx
-<AuthContext.Provider value={user}>
-```
-
-Consumers subscribe to provider value.
-
-
-
-### Internals
-
-React stores current context value on provider Fiber.
-
-Consumers register dependency.
-
-When provider value changes:
-
-```txt
-all consumers rerender
-```
-
-
-
-### Important Problem
-
-```jsx
-value={{ user }}
-```
-
-New object every render.
-
-Causes all consumers to rerender.
-
-
-
-### Optimization
-
-```jsx
-const value = useMemo(() => ({ user }), [user]);
-```
-
-
-
-### Misconception
-
-Context is NOT state management.
-
-It is dependency injection mechanism.
-
-
-
-## 14. Custom Hooks Architecture
-
-Custom hooks are reusable stateful logic.
+**Custom hooks are just functions that call other hooks.** They encapsulate reusable stateful logic.
 
 ```jsx
 function useUser() {
   const [user, setUser] = useState(null);
-
+  useEffect(() => {
+    fetchUser().then(setUser);
+  }, []);
   return user;
 }
 ```
 
-They are NOT special to React.
+**More realistic example — useAsync for data fetching:**
 
-Just functions using hooks.
-
-
-
-### Real Power
-
-Encapsulation.
-
-Custom hooks can hide:
-
-- subscriptions
-- caching
-- fetching
-- synchronization
-- complex state logic
-
-
-
-### Design Philosophy
-
-Hooks compose behavior vertically.
-
-Classes composed horizontally via inheritance.
-
-Hooks solved logic reuse elegantly.
-
-
-
-## 15. useReducer Deep Dive
-
-Alternative to `useState`.
+This pattern replaces repetitive loading/error/data boilerplate that you'd otherwise write in every component:
 
 ```jsx
-const [state, dispatch] = useReducer(reducer, initial);
-```
+function useAsync(asyncFn, deps = []) {
+  const [state, setState] = useState({
+    status: "idle", // idle | loading | success | error
+    data: null,
+    error: null,
+  });
 
-Inspired by Redux.
+  useEffect(() => {
+    let cancelled = false;
 
+    setState({ status: "loading", data: null, error: null });
 
+    asyncFn()
+      .then((data) => {
+        if (!cancelled) setState({ status: "success", data, error: null });
+      })
+      .catch((error) => {
+        if (!cancelled) setState({ status: "error", data: null, error });
+      });
 
-### Why It Exists
+    return () => { cancelled = true; }; // prevent stale updates
+  }, deps);
 
-Complex state transitions become predictable.
-
-Bad:
-
-```jsx
-setState({...})
-setState({...})
-setState({...})
-```
-
-Better:
-
-```jsx
-dispatch({ type: "ADD" });
-```
-
-
-
-### Internals
-
-Similar to `useState`.
-
-Difference:
-
-React calls reducer to compute next state.
-
-
-
-### Benefits
-
-- centralized transitions
-- predictable updates
-- easier debugging
-- scalable logic
-
-
-
-## 16. Hook Execution Order
-
-Hooks rely entirely on execution order.
-
-React internally does:
-
-```txt
-Hook 1
-Hook 2
-Hook 3
-```
-
-NOT names.
-
-This is why hooks cannot be conditional.
-
-
-
-### Important Understanding
-
-React does NOT attach hooks to variables.
-
-This:
-
-```jsx
-const [count]
-```
-
-is irrelevant internally.
-
-Only call position matters.
-
-
-
-## 17. Hook Storage Internals (Fiber + Linked List)
-
-One of the most advanced hooks topics.
-
-Each component has Fiber node.
-
-Fiber stores linked list of hooks.
-
-Simplified:
-
-```js
-Fiber.memoizedState → Hook1 → Hook2 → Hook3
-```
-
-Each hook contains:
-
-```js
-{
-  memoizedState,
-  queue,
-  next
+  return state;
 }
+
+// Usage
+const { status, data: users, error } = useAsync(() => fetchUsers(), []);
+
+if (status === "loading") return <Spinner />;
+if (status === "error") return <ErrorMessage />;
+return <UserList users={users} />;
 ```
 
-During rendering React walks linked list sequentially.
+This handles: loading state, error state, stale request cancellation, and clean re-fetching on dependency change — all in one reusable hook.
 
+**The real power:** Encapsulation. Custom hooks hide complex logic (subscriptions, caching, fetching, synchronization) behind a simple interface. Hooks compose behavior vertically (stack functions that each add a capability), making reuse much cleaner than class inheritance.
 
+**Best practices:**
+- Always prefix with "use" for linting
+- Return stable values or objects
+- Keep hooks focused on one responsibility
+- Document what the hook does and expects
 
-### Why Linked List?
+**Linting:** `eslint-plugin-react-hooks` automatically enforces hook rules and catches missing dependencies in useEffect. It's installed by default in Create React App and Vite. Always have it enabled — it catches 90% of stale closure bugs before they happen.
 
-Hooks count is dynamic.
+---
 
-Linked list allows efficient insertion/traversal.
+## 12. Common Pitfalls
 
+**Interview Focus:** Demonstrating awareness of common mistakes shows experience.
 
-
-## 18. Batching with Hooks
-
-React batches multiple updates.
-
-```jsx
-setA(1);
-setB(2);
-```
-
-React performs single rerender.
-
-
-
-### Why Batching Exists
-
-Without batching:
-
-```txt
-render 1
-render 2
-render 3
-```
-
-Very expensive.
-
-
-
-### React 18 Automatic Batching
-
-Before React 18:
-
-- only React events batched
-
-Now:
-
-- promises
-- timeouts
-- async callbacks
-- native events
-
-also batch automatically.
-
-
-
-## 19. Concurrent Rendering + Hooks
-
-Concurrent rendering allows interruptible rendering.
-
-React can:
-
-- pause rendering
-- resume later
-- prioritize urgent updates
-
-Hooks had to be redesigned carefully for this.
-
-
-
-### Important Principle
-
-Render phase can restart.
-
-Therefore hooks must remain pure.
-
-Bad:
-
-```jsx
-useMemo(() => {
-  mutateSomething();
-}, []);
-```
-
-Concurrent rendering may run multiple times.
-
-
-
-### Transition Updates
-
-```jsx
-startTransition(() => {
-  setSearch(query);
-});
-```
-
-Marks low-priority updates.
-
-
-
-## 20. Strict Mode & Hooks Behavior
-
-Strict Mode intentionally double-invokes renders in development.
-
-Why?
-
-To detect unsafe side effects.
-
-Example:
-
-```jsx
-useEffect(() => {
-  console.log("effect");
-}, []);
-```
-
-May run twice in development.
-
-
-
-### Important Clarification
-
-Production does NOT double-run.
-
-Strict mode simulates remounting behavior.
-
-
-
-### What It Detects
-
-- impure rendering
-- missing cleanup
-- unsafe mutations
-
-
-
-## 21. Advanced Hooks
-
-Important advanced hooks:
-
-### useLayoutEffect
-
-Runs synchronously before browser paint.
-
-Useful for measurements.
-
-
-
-### useImperativeHandle
-
-Customizes exposed ref API.
-
-
-
-### useTransition
-
-Marks non-urgent updates.
-
-
-
-### useDeferredValue
-
-Defers expensive rendering.
-
-
-
-### useSyncExternalStore
-
-Designed for external store consistency.
-
-Important for concurrent rendering safety.
-
-
-
-### useInsertionEffect
-
-Used mainly by CSS-in-JS libraries.
-
-Runs before layout effects.
-
-
-
-## 22. Hook Performance Optimization
-
-Most performance problems are NOT solved with memoization.
-
-Real optimizations:
-
-- reduce unnecessary renders
-- split components
-- colocate state
-- virtualize large lists
-- avoid giant contexts
-
-
-
-### Expensive Patterns
-
-#### Derived state in effects
-
-Bad:
-
-```jsx
-useEffect(() => {
-  setFiltered(data.filter(...));
-}, [data]);
-```
-
-Better:
-
-```jsx
-const filtered = useMemo(...)
-```
-
-
-
-### Overusing Context
-
-Large global context causes rerender storms.
-
-
-
-## 23. Common Hooks Pitfalls
-
-### Infinite Effects
+**1. Infinite effect loops:**
 
 ```jsx
 useEffect(() => {
   setState(x);
-}, [x]);
+}, [x]); // setState updates x, which triggers effect, which updates x...
 ```
 
-Can create loops.
+**2. Missing dependencies** - leads to stale closures. Add all referenced values to the array or restructure your code.
 
-
-
-### Missing Dependencies
-
-Leads to stale closures.
-
-
-
-### Over-Memoization
-
-Too much `useMemo/useCallback` harms readability and performance.
-
-
-
-### State Duplication
+**3. State duplication:**
 
 ```jsx
-const [filtered, setFiltered]
+const [filtered, setFiltered] = useState([]);
 ```
 
-when value can be derived.
+If you can compute `filtered` from existing state, don't store it separately - derive it.
 
+**4. Effect abuse** - effects are for synchronizing with external systems, not for deriving UI state. If you're calling `setState` in an effect to derive UI state, you're probably doing it wrong.
 
+**5. Over-memoization** - wrapping everything in `useMemo`/`useCallback` adds cognitive overhead and comparison cost. Measure before you optimize.
 
-### Effect Abuse
+**6. Using refs for state that should trigger renders** - if changing a value should update the UI, use `useState`, not `useRef`.
 
-Effects should synchronize external systems.
-
-Not replace normal rendering logic.
-
-
-
-## 24. Senior-Level Hooks Patterns
-
-
-
-### State Colocation
-
-Keep state closest to usage.
-
-Avoid unnecessary lifting.
-
-
-
-### Reducer + Context Architecture
-
-Common scalable pattern.
-
-```txt
-Context → dispatch
-Reducer → state transitions
-```
-
-
-
-### Headless Hooks
-
-Hooks containing logic only.
-
-UI separated completely.
-
-Example:
-
-```jsx
-useModal()
-```
-
-
-
-### Resource Hooks
-
-Encapsulate:
-
-- fetching
-- caching
-- retry logic
-- loading state
-
-
-
-### Subscription Hooks
-
-Encapsulate event listeners safely.
-
-
-
-### Controlled vs Uncontrolled Hooks
-
-Senior engineers carefully decide:
-
-- render-driven state
-- mutable refs
-- external stores
-
-based on performance needs.
-
-
+---
 
 ## Final Mental Model
 
-Hooks are not magic functions.
+Hooks are not magic. They are:
 
-They are:
+> Ordered state containers attached to components during rendering.
 
-> Ordered state containers attached to Fiber nodes during rendering.
+Everything becomes clearer once you internalize:
 
-Everything about hooks becomes easier once you understand:
+- **Renders are snapshots** - each render sees a frozen version of state
+- **Hooks depend on order** - React matches calls to stored state by position
+- **Effects synchronize with external systems** - not for deriving UI state
+- **Memoization is for reference equality** - prevents unnecessary re-renders
+- **Every render has its own props, state, and handlers** - closures capture values from their render
 
-- renders are snapshots
-- hooks depend on order
-- React stores hooks in linked lists
-- effects synchronize external systems
-- memoization is reference optimization
-- concurrent rendering requires purity
-- React rerenders entire component functions repeatedly
+---
+
+## React Compiler (Future of Memoization)
+
+**What it is:** The React Compiler (previously called "React Forget") is an upcoming compiler that automatically adds memoization to your code at build time.
+
+**Why it matters:** Today, you manually write `useMemo`, `useCallback`, and `React.memo` to prevent unnecessary re-renders. The React Compiler analyzes your code and inserts these automatically — meaning you won't need to write them manually.
+
+**Status:** Available as of React 19 (experimental in some setups). If your team upgrades, a lot of manual memoization becomes unnecessary.
+
+**Practical impact for interviews:** When asked about performance, mention that the React Compiler is changing this area — but also show you understand *why* memoization works (for interviewers on older codebases, manual memoization knowledge still matters).
